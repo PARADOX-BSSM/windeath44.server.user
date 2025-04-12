@@ -1,3 +1,14 @@
 spring:
-  profiles:
-    active: dev
+  datasource:
+    username: ${db-username}
+    password: ${db-password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${db-url}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+
+server:
+  port:
+    ${server-port}

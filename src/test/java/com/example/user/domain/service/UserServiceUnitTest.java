@@ -38,7 +38,7 @@ public class UserServiceUnitTest {
   void when_valid_request_then_register_user_successfully() {
     UserCreateRequest request = new UserCreateRequest("test", "test123@gmail.com", "방세준", "pw1234");
     given(userRepository.existsUserByEmail(request.email())).willReturn(false);
-    given(passwordEncoder.encode(request.password())).willReturn("encodeedPw");
+    given(passwordEncoder.encode(request.password())).willReturn("encodedPw");
 
     userService.register(request);
 

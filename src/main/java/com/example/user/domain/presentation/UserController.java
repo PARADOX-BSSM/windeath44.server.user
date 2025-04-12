@@ -11,21 +11,21 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/users/{user_id}")
 public class UserController {
   private final UserService userService;
 
-  @GetMapping("/{user_id}")
+  @GetMapping
   public ResponseEntity<UserResponse> findUserById(@PathVariable("user_id") String userId) {
     UserResponse userResponse = userService.findById(userId);
     return ResponseEntity.ok(userResponse);
   }
-  @PatchMapping("/{user_id}")
+  @PatchMapping
   public ResponseEntity<UserResponse> changeUserById(@PathVariable("user_id") String userId, @Valid @RequestBody UserUpdateRequest request) {
     UserResponse userResponse = userService.changeById(userId, request);
     return ResponseEntity.ok(userResponse);
   }
-  @DeleteMapping("/{user_id}")
+  @DeleteMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteUserById(@PathVariable("user_id") String userId) {
     userService.deleteById(userId);
