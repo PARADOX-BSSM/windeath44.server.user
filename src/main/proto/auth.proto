@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.example.grpc";
+option java_outer_classname = "Proto";
+
+service AuthenticationService {
+  rpc checkUser(CheckUserRequest) returns (CheckUserResponse);
+}
+
+message CheckUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message CheckUserResponse {
+  bool existsUser = 1;
+}
+
