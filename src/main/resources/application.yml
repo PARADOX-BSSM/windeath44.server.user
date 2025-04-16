@@ -8,6 +8,11 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+grpc:
+  server:
+    address: ${GRPC_SERVER_ADDRESS}
 
 server:
   port:
