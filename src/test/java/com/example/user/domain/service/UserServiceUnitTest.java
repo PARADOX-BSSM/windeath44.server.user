@@ -2,6 +2,9 @@ package com.example.user.domain.service;
 
 import com.example.user.domain.domain.User;
 import com.example.user.domain.domain.repository.UserRepository;
+import com.example.user.domain.exception.AlreadyExistsUserEmailException;
+import com.example.user.domain.exception.AlreadyExistsUserIdException;
+import com.example.user.domain.exception.NotFoundUserException;
 import com.example.user.domain.presentation.dto.request.UserCreateRequest;
 import com.example.user.domain.presentation.dto.request.UserUpdateRequest;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +48,26 @@ public class UserServiceUnitTest {
     then(userRepository).should().save(any(User.class));
   }
   @Test
+  @DisplayName("동일한 UserId가 존재하는 경우 예외 발생")
+  void when_valid_userId_then_register_user_failfully() {
+    UserCreateRequest request = new UserCreateRequest("test", "test123@gmail.com", "방세준", "pw1234");
+    given(userRepository.existsById(request.userId())).willReturn(true);
+
+    assertThrows(AlreadyExistsUserIdException.class,
+            () -> userService.register(request));
+  }
+  @Test
+  @DisplayName("동일한 email이 존재하는 경우 예외 발생")
+  void when_valid_email_then_register_user_failfully() {
+    UserCreateRequest request = new UserCreateRequest("test", "test123@gmail.com", "방세준", "pw1234");
+    given(userRepository.existsUserByEmail(request.email())).willReturn(true);
+
+    assertThrows(AlreadyExistsUserEmailException.class,
+            () -> userService.register(request));
+  }
+
+
+  @Test
   @DisplayName("UserId를 통해 유저를 찾을 수 있는가?")
   void when_valid_userId_then_findById_user_successfully() {
     String userId = "test";
@@ -56,6 +79,18 @@ public class UserServiceUnitTest {
   }
 
   @Test
+  @DisplayName("UserId를 통해 존재하지 않는 유저를 조회하려 했을 경우 예외 발생")
+  void when_valid_userId_then_findById_user_failfully() {
+    String userId = "test";
+    given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+    assertThrows(NotFoundUserException.class,
+            () -> userService.findById(userId)
+    );
+  }
+
+
+  @Test
   @DisplayName("UserId를 통해 유저를 변경할 수 있는가?")
   void when_valid_userId_then_changeById_user_successfully() {
     String userId = "test";
@@ -65,7 +100,7 @@ public class UserServiceUnitTest {
 
     userService.changeById(userId, updateInfo);
 
-    then(user).should().change(updateInfo, passwordEncoder);
+    then(user).should().update(updateInfo, passwordEncoder);
   }
 
   @Test

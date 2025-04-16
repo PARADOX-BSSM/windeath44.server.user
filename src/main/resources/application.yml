@@ -8,7 +8,12 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
 
 server:
   port:
     ${server-port}
+grpc:
+  server:
+    address: ${GRPC_SERVER_ADDRESS}
