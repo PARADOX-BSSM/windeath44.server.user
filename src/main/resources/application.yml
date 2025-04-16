@@ -1,9 +1,9 @@
 spring:
   datasource:
-    username: ${db-username}
-    password: ${db-password}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${db-url}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: ${JDBC_DRIVER_SOURCE}
+    url: ${DB_URL}
   jpa:
     show-sql: true
     hibernate:
@@ -11,4 +11,4 @@ spring:
 
 server:
   port:
-    ${server-port}
+    ${SERVER_PORT}
