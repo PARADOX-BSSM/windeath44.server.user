@@ -44,21 +44,23 @@ public class User {
             .role(Role.USER)
             .build();
   }
-  public boolean equalsPassword(String password) {
-    return this.password.equals(password);
+
+  public boolean equalsPassword(String password, PasswordEncoder encoder) {
+    return encoder.matches(password, this.password);
   }
 
-  public void change(UserUpdateRequest updateInfo, PasswordEncoder passwordEncoder) {
+  public void update(UserUpdateRequest updateInfo, PasswordEncoder passwordEncoder) {
     this.name = updateInfo.name();
     this.profile = updateInfo.profile();
     changeToEncodedPassword(updateInfo.password(), passwordEncoder);
   }
 
-  private void changePassword(String password) {
-    this.password = password;
-  }
   public void changeToEncodedPassword(String password, PasswordEncoder encoder) {
     String encodedPassword = encoder.encode(password);
     changePassword(encodedPassword);
+  }
+
+  private void changePassword(String password) {
+    this.password = password;
   }
 }

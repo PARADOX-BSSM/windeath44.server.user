@@ -4,16 +4,34 @@ option java_multiple_files = true;
 option java_package = "com.example.grpc";
 option java_outer_classname = "Proto";
 
-service AuthenticationService {
-  rpc checkUser(CheckUserRequest) returns (CheckUserResponse);
+// login
+
+service UserLoginService {
+  rpc checkUser(UserLoginRequest) returns (UserLoginResponse);
 }
 
-message CheckUserRequest {
-  string email = 1;
+message UserLoginRequest {
+  string userId = 1;
   string password = 2;
 }
 
-message CheckUserResponse {
+message UserLoginResponse {
   bool existsUser = 1;
+  string userId = 2;
+  string role = 3;
+}
+
+// register
+
+service UserRegisterService {
+  rpc checkEmailValidation(UserRegisterRequest) returns (UserRegisterResponse);
+}
+
+message UserRegisterRequest {
+  string email = 1;
+}
+
+message UserRegisterResponse {
+  bool emailValidation = 1;
 }
 
