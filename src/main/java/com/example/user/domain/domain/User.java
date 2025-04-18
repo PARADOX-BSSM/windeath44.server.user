@@ -36,15 +36,6 @@ public class User {
     if (this.profile == null) this.profile = "Default.png";
   }
 
-  public static User create(String userId, String email, String name) {
-    return User.builder()
-            .userId(userId)
-            .email(email)
-            .name(name)
-            .role(Role.USER)
-            .build();
-  }
-
   public boolean equalsPassword(String password, PasswordEncoder encoder) {
     return encoder.matches(password, this.password);
   }

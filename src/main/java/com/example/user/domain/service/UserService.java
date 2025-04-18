@@ -1,6 +1,7 @@
 package com.example.user.domain.service;
 
 import com.example.user.domain.domain.User;
+import com.example.user.domain.domain.mapper.UserMapper;
 import com.example.user.domain.domain.repository.UserRepository;
 import com.example.user.domain.exception.AlreadyExistsUserEmailException;
 import com.example.user.domain.exception.AlreadyExistsUserException;
@@ -22,6 +23,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final GrpcClientService grpcClientService;
   private final PasswordEncoder passwordEncoder;
+  private final UserMapper userMapper;
 
   @Transactional
   public void register(UserCreateRequest request) {
@@ -30,12 +32,7 @@ public class UserService {
 
     grpcClientService.validateEmail(email);
     checkExistsUser(userId, email);
-
-    User user = User.create(
-            request.userId(),
-            email,
-            request.name()
-    );
+    User user = toUser(request);
     user.changeToEncodedPassword(request.password(), passwordEncoder);
     userRepository.save(user);
   }
@@ -53,14 +50,14 @@ public class UserService {
 }
   public UserResponse findById(String userId) {
     User user = getUserById(userId);
-    UserResponse userResponse = UserResponse.toUserResponse(user);
+    UserResponse userResponse = toUserResponse(user);
     return userResponse;
   }
 
   public UserResponse changeById(String userId, UserUpdateRequest updateInfo) {
     User user = getUserById(userId);
     user.update(updateInfo, passwordEncoder);
-    UserResponse userResponse = UserResponse.toUserResponse(user);
+    UserResponse userResponse = toUserResponse(user);
     return userResponse;
   }
 
@@ -74,4 +71,13 @@ public class UserService {
     User user = getUserById(userId);
     userRepository.delete(user);
   }
+
+  private User toUser(UserCreateRequest request) {
+    return userMapper.toEntity(request);
+  }
+
+  private UserResponse toUserResponse(User user) {
+    return userMapper.toDto(user);
+  }
+
 }
