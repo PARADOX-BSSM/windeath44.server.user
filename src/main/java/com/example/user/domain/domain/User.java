@@ -18,10 +18,6 @@ import java.time.LocalDateTime;
 @Builder
 public class User {
   @Id
-  @Column(name="user_key")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long userKey;
-  @Column(unique = true, name="user_id")
   private String userId;
   @Column(unique = true)
   private String email;
