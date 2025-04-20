@@ -33,18 +33,3 @@ message UserRegisterRequest {
 message UserRegisterResponse {
 
 }
-
-// OAuth User Login
-
-service OauthUserLoginService {
-  rpc OauthUserRegister(OauthUserLoginRequest) returns (OauthUserLoginResponse);
-}
-
-message  OauthUserLoginRequest{
-  string email = 1;
-  string name = 2; // = name
-}
-
-message OauthUserLoginResponse {
-  string userKey = 1;
-}
