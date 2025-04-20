@@ -1,6 +1,8 @@
 package com.example.user.domain.service;
 
 import com.example.user.domain.domain.User;
+import com.example.user.domain.domain.UserRole;
+import com.example.user.domain.domain.mapper.UserMapper;
 import com.example.user.domain.domain.repository.UserRepository;
 import com.example.user.domain.exception.AlreadyExistsUserEmailException;
 import com.example.user.domain.exception.AlreadyExistsUserIdException;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -32,6 +35,9 @@ public class UserServiceUnitTest {
   private UserRepository userRepository;
   @Mock
   private PasswordEncoder passwordEncoder;
+
+  @Mock
+  private UserMapper userMapper;
 
   @InjectMocks
   private UserService userService;
@@ -71,7 +77,8 @@ public class UserServiceUnitTest {
   @DisplayName("UserId를 통해 유저를 찾을 수 있는가?")
   void when_valid_userId_then_findById_user_successfully() {
     String userId = "test";
-    given(userRepository.findById(userId)).willReturn(Optional.ofNullable(User.create(userId, "test123@gmail.com", "pdh")));
+    UserCreateRequest userCreateRequest = new UserCreateRequest(userId, "test123@gmail.com", "pdh", "asdasd");
+    given(userRepository.findById(userId)).willReturn(Optional.ofNullable(userMapper.toEntity(userCreateRequest, UserRole.USER)));
 
     userService.findById(userId);
 
@@ -99,8 +106,10 @@ public class UserServiceUnitTest {
     given(userRepository.findById(userId)).willReturn(Optional.ofNullable(user));
 
     userService.changeById(userId, updateInfo);
-
-    then(user).should().update(updateInfo, passwordEncoder);
+    String name = updateInfo.name();
+    String profile = updateInfo.profile();
+    String password = updateInfo.password();
+    then(user).should().update(name, profile, password, passwordEncoder);
   }
 
   @Test

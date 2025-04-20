@@ -1,11 +1,10 @@
-package com.example.user.domain.service;
+package com.example.user.domain.service.gRPC;
 
-import com.example.grpc.AuthenticationServiceGrpc;
-import com.example.grpc.CheckUserRequest;
-import com.example.grpc.CheckUserResponse;
+import com.example.grpc.UserLoginRequest;
+import com.example.grpc.UserLoginResponse;
+import com.example.grpc.UserLoginServiceGrpc;
 import com.example.user.domain.domain.User;
 import com.example.user.domain.domain.repository.UserRepository;
-import com.example.user.domain.exception.NotFoundUserException;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
@@ -16,23 +15,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @GrpcService
 @RequiredArgsConstructor
-@Slf4j
-public class AuthenticationGrpcService extends AuthenticationServiceGrpc.AuthenticationServiceImplBase {
+public class GrpcUserLoginService extends UserLoginServiceGrpc.UserLoginServiceImplBase {
   private final PasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
 
   @Override
-  public void checkUser(CheckUserRequest request, StreamObserver<CheckUserResponse> responseObserver) {
+  public void checkUser(UserLoginRequest request, StreamObserver<UserLoginResponse> responseObserver) {
     try {
-      String email = request.getEmail();
+      String userId = request.getUserId();
       String password = request.getPassword();
-      User user = findUserByEmail(email);
+
+      User user = findUserByUserId(userId);
       boolean existsUser = existsUser(user, password, passwordEncoder);
 
-      CheckUserResponse checkUserResponse = CheckUserResponse.newBuilder()
+      UserLoginResponse checkUserResponse = UserLoginResponse.newBuilder()
               .setExistsUser(existsUser)
-              .setUserId(user.getUserId())
-              .setRole(String.valueOf(user.getRole()))
+              .setUserKey(String.valueOf(user.getUserKey()))
               .build();
       responseObserver.onNext(checkUserResponse);
       responseObserver.onCompleted();
@@ -45,8 +43,8 @@ public class AuthenticationGrpcService extends AuthenticationServiceGrpc.Authent
     return user.equalsPassword(password, passwordEncoder);
   }
 
-  private User findUserByEmail(String email) {
-    User user = userRepository.findUserByEmail(email)
+  private User findUserByUserId(String userId) {
+    User user = userRepository.findByUserId(userId)
             .orElseThrow(() -> Status.NOT_FOUND
                     .withDescription("Not found user with email")
                     .asRuntimeException()
