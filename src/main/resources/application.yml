@@ -13,6 +13,12 @@ spring:
 grpc:
   server:
     address: ${GRPC_SERVER_ADDRESS}
+    port: ${GRPC_SERVER_PORT}
+
+  client:
+    auth-server:
+      address: ${GRPC_AUTH_SERVER_ADDRESS}
+      negotiationType: "plaintext"
 
 server:
   port:

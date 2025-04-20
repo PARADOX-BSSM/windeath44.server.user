@@ -12,21 +12,25 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
 
 @Entity
-@Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
   @Id
-  @Column(name="user_id")
+  @Column(name="user_key")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long userKey;
+  @Column(unique = true, name="user_id")
   private String userId;
+  @Column(unique = true)
   private String email;
   private String name;
   private String password;
   @Enumerated(EnumType.STRING)
-  private Role role;
-  private Long remain_token = 0L;
-  private String profile = "default.png";
+  private UserRole role;
+  private Long remain_token;
+  private String profile;
   @CreationTimestamp
   private LocalDateTime created_at;
 
@@ -36,22 +40,15 @@ public class User {
     if (this.profile == null) this.profile = "Default.png";
   }
 
-  public static User create(String userId, String email, String name) {
-    return User.builder()
-            .userId(userId)
-            .email(email)
-            .name(name)
-            .role(Role.USER)
-            .build();
-  }
   public boolean equalsPassword(String password, PasswordEncoder encoder) {
     return encoder.matches(password, this.password);
   }
 
-  public void update(UserUpdateRequest updateInfo, PasswordEncoder passwordEncoder) {
-    this.name = updateInfo.name();
-    this.profile = updateInfo.profile();
-    changeToEncodedPassword(updateInfo.password(), passwordEncoder);
+
+  public void update(String name, String profile, String password, PasswordEncoder passwordEncoder) {
+    this.name = name;
+    this.profile = profile;
+    changeToEncodedPassword(password, passwordEncoder);
   }
 
   public void changeToEncodedPassword(String password, PasswordEncoder encoder) {
