@@ -1,7 +1,5 @@
 package com.example.user.domain.domain.mapper;
 
-//import com.example.grpc.OauthUserLoginRequest;
-import com.example.grpc.OauthUserLoginRequest;
 import com.example.user.domain.domain.User;
 import com.example.user.domain.domain.UserRole;
 import com.example.user.domain.presentation.dto.request.UserCreateRequest;
@@ -14,6 +12,5 @@ public interface UserMapper {
 
   User toEntity(UserCreateRequest request, UserRole role);
 
-  User toEntity(OauthUserLoginRequest request, UserRole role);
   UserResponse toDto(User user);
 }
