@@ -11,6 +11,7 @@ import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+
 @GrpcService
 @RequiredArgsConstructor
 public class GrpcOAuthUserLoginService extends OauthUserLoginServiceGrpc.OauthUserLoginServiceImplBase {
