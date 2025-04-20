@@ -1,6 +1,7 @@
 package com.example.user.domain.service;
 
 import com.example.user.domain.domain.User;
+import com.example.user.domain.domain.UserRole;
 import com.example.user.domain.domain.mapper.UserMapper;
 import com.example.user.domain.domain.repository.UserRepository;
 import com.example.user.domain.exception.AlreadyExistsUserEmailException;
@@ -38,7 +39,7 @@ public class UserService {
   }
 
   private void checkExistsUser(String userId, String email) {
-  boolean existsUserById = userRepository.existsById(userId);
+  boolean existsUserById = userRepository.existsByUserId(userId);
   if (existsUserById) {
     throw new AlreadyExistsUserIdException("UserId already exists");
   }
@@ -56,13 +57,16 @@ public class UserService {
 
   public UserResponse changeById(String userId, UserUpdateRequest updateInfo) {
     User user = getUserById(userId);
-    user.update(updateInfo, passwordEncoder);
+    String name = updateInfo.name();
+    String profile = updateInfo.profile();
+    String password = updateInfo.password();
+    user.update(name, profile, password, passwordEncoder);
     UserResponse userResponse = toUserResponse(user);
     return userResponse;
   }
 
   private User getUserById(String userId) {
-    User user = userRepository.findById(userId)
+    User user = userRepository.findByUserId(userId)
             .orElseThrow(() -> new NotFoundUserException("Not found user with id"));
     return user;
   }
@@ -73,7 +77,9 @@ public class UserService {
   }
 
   private User toUser(UserCreateRequest request) {
-    return userMapper.toEntity(request);
+    User user = userMapper.toEntity(request, UserRole.USER);
+    return user;
+
   }
 
   private UserResponse toUserResponse(User user) {

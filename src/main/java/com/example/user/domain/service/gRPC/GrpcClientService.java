@@ -20,7 +20,7 @@ public class GrpcClientService {
 
   public void validateEmail(String email) {
     UserRegisterResponse response = sendToRegisterUserRequest(email);
-    boolean userExists = response.getEmailValidation();
+    // No error mean success
   }
 
 
