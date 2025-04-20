@@ -32,7 +32,7 @@ public class UserService {
     user.changeToEncodedPassword(request.password(), passwordEncoder);
     userRepository.save(user);
   }
-private void checkExistsUser(String userId, String email) {
+  private void checkExistsUser(String userId, String email) {
   boolean existsUserById = userRepository.existsById(userId);
   if (existsUserById) {
     throw new AlreadyExistsUserIdException("UserId already exists");
@@ -42,7 +42,6 @@ private void checkExistsUser(String userId, String email) {
   if (existsUserByEmail) {
     throw new AlreadyExistsUserEmailException("UserEmail already exists");
   }
-
 }
   public UserResponse findById(String userId) {
     User user = getUserById(userId);
@@ -52,7 +51,7 @@ private void checkExistsUser(String userId, String email) {
 
   public UserResponse changeById(String userId, UserUpdateRequest updateInfo) {
     User user = getUserById(userId);
-    user.change(updateInfo, passwordEncoder);
+    user.update(updateInfo, passwordEncoder);
     UserResponse userResponse = UserResponse.toUserResponse(user);
     return userResponse;
   }
