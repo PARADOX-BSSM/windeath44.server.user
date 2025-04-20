@@ -30,7 +30,8 @@ public class GrpcUserLoginService extends UserLoginServiceGrpc.UserLoginServiceI
 
       UserLoginResponse checkUserResponse = UserLoginResponse.newBuilder()
               .setExistsUser(existsUser)
-              .setUserKey(String.valueOf(user.getUserKey()))
+              .setUserId(String.valueOf(user.getUserId()))
+              .setRole(user.getRole().toString())
               .build();
       responseObserver.onNext(checkUserResponse);
       responseObserver.onCompleted();
