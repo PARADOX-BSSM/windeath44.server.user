@@ -40,6 +40,7 @@ public class User {
     if (this.profile == null) this.profile = "Default.png";
   }
 
+
   public boolean equalsPassword(String password, PasswordEncoder encoder) {
     return encoder.matches(password, this.password);
   }
