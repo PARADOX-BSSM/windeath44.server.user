@@ -24,13 +24,13 @@ public class GrpcUserLoginService extends UserLoginServiceGrpc.UserLoginServiceI
     try {
       String userId = request.getUserId();
       String password = request.getPassword();
+
       User user = findUserByUserId(userId);
       boolean existsUser = existsUser(user, password, passwordEncoder);
 
       UserLoginResponse checkUserResponse = UserLoginResponse.newBuilder()
               .setExistsUser(existsUser)
-              .setUserId(user.getUserId())
-              .setRole(String.valueOf(user.getRole()))
+              .setUserKey(String.valueOf(user.getUserKey()))
               .build();
       responseObserver.onNext(checkUserResponse);
       responseObserver.onCompleted();
@@ -44,7 +44,7 @@ public class GrpcUserLoginService extends UserLoginServiceGrpc.UserLoginServiceI
   }
 
   private User findUserByUserId(String userId) {
-    User user = userRepository.findById(userId)
+    User user = userRepository.findByUserId(userId)
             .orElseThrow(() -> Status.NOT_FOUND
                     .withDescription("Not found user with email")
                     .asRuntimeException()

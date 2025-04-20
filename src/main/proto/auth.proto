@@ -17,11 +17,10 @@ message UserLoginRequest {
 
 message UserLoginResponse {
   bool existsUser = 1;
-  string userId = 2;
-  string role = 3;
+  string userKey = 2;
 }
 
-// register
+// email Validate to register
 
 service UserRegisterService {
   rpc checkEmailValidation(UserRegisterRequest) returns (UserRegisterResponse);
@@ -32,6 +31,20 @@ message UserRegisterRequest {
 }
 
 message UserRegisterResponse {
-  bool emailValidation = 1;
+
 }
 
+// OAuth User Login
+
+service OauthUserLoginService {
+  rpc OauthUserRegister(OauthUserLoginRequest) returns (OauthUserLoginResponse);
+}
+
+message  OauthUserLoginRequest{
+  string email = 1;
+  string name = 2; // = name
+}
+
+message OauthUserLoginResponse {
+  string userKey = 1;
+}
