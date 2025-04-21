@@ -41,10 +41,9 @@ public class User {
   }
 
 
-  public void update(String name, String profile, String password, PasswordEncoder passwordEncoder) {
+  public void update(String name, String profile) {
     this.name = name;
     this.profile = profile;
-    changeToEncodedPassword(password, passwordEncoder);
   }
 
   public void changeToEncodedPassword(String password, PasswordEncoder encoder) {

@@ -13,7 +13,6 @@ import com.example.user.domain.presentation.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -58,8 +57,7 @@ public class UserService {
     User user = getUserById(userId);
     String name = updateInfo.name();
     String profile = updateInfo.profile();
-    String password = updateInfo.password();
-    user.update(name, profile, password, passwordEncoder);
+    user.update(name, profile);
     UserResponse userResponse = toUserResponse(user);
     return userResponse;
   }
@@ -85,4 +83,8 @@ public class UserService {
     return userMapper.toDto(user);
   }
 
+  public void changePassword(String userId, String password) {
+    User user = getUserById(userId);
+    user.changeToEncodedPassword(password, passwordEncoder);
+  }
 }
