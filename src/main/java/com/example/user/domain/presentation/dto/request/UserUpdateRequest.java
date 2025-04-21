@@ -1,15 +1,11 @@
 package com.example.user.domain.presentation.dto.request;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 
-public record UserUpdateRequest (
-        @NotEmpty
+public record  UserUpdateRequest (
+        @NotNull(message="name is null")
         String name,
-        @NotEmpty
-        String password,
-        @NotNull
+        @NotNull(message="profile is null")
         String profile
 ) {
 }

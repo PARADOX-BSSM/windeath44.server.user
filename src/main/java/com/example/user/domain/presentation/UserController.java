@@ -1,5 +1,6 @@
 package com.example.user.domain.presentation;
 
+import com.example.user.domain.presentation.dto.request.UserChangePasswordRequest;
 import com.example.user.domain.presentation.dto.request.UserUpdateRequest;
 import com.example.user.domain.presentation.dto.response.UserResponse;
 import com.example.user.domain.service.UserService;
@@ -21,7 +22,7 @@ public class UserController {
     return ResponseEntity.ok(userResponse);
   }
   @PatchMapping
-  public ResponseEntity<UserResponse> changeUserById(@PathVariable("user_id") String userId, @Valid @RequestBody UserUpdateRequest request) {
+  public ResponseEntity<UserResponse> changeUserById(@PathVariable("user_id") String userId, @RequestBody @Valid UserUpdateRequest request) {
     UserResponse userResponse = userService.changeById(userId, request);
     return ResponseEntity.ok(userResponse);
   }
@@ -29,5 +30,11 @@ public class UserController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteUserById(@PathVariable("user_id") String userId) {
     userService.deleteById(userId);
+  }
+
+  @PatchMapping
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void changePassword(@PathVariable("user_id") String userId, @RequestBody @Valid UserChangePasswordRequest request) {
+    userService.changePassword(userId, request.password());
   }
 }
