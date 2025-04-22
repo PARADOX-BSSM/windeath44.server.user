@@ -12,21 +12,21 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users/{user_id}")
+@RequestMapping("/users")
 public class UserController {
   private final UserService userService;
 
-  @GetMapping
+  @GetMapping("/{user_id}")
   public ResponseEntity<UserResponse> findUserById(@PathVariable("user_id") String userId) {
     UserResponse userResponse = userService.findById(userId);
     return ResponseEntity.ok(userResponse);
   }
-  @PatchMapping
+  @PatchMapping("/{user_id}")
   public ResponseEntity<UserResponse> changeUserById(@PathVariable("user_id") String userId, @RequestBody @Valid UserUpdateRequest request) {
     UserResponse userResponse = userService.changeById(userId, request);
     return ResponseEntity.ok(userResponse);
   }
-  @DeleteMapping
+  @DeleteMapping("/{user_id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteUserById(@PathVariable("user_id") String userId) {
     userService.deleteById(userId);
@@ -34,7 +34,7 @@ public class UserController {
 
   @PatchMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void changePassword(@PathVariable("user_id") String userId, @RequestBody @Valid UserChangePasswordRequest request) {
-    userService.changePassword(userId, request.password());
+  public void changePassword(@RequestBody @Valid UserChangePasswordRequest request) {
+    userService.changePassword(request.email(), request.password());
   }
 }

@@ -83,8 +83,9 @@ public class UserService {
     return userMapper.toDto(user);
   }
 
-  public void changePassword(String userId, String password) {
-    User user = getUserById(userId);
+  public void changePassword(String email, String password) {
+    User user = userRepository.findUserByEmail(email)
+                    .orElseThrow(() -> new NotFoundUserException("Not found User with email"));
     user.changeToEncodedPassword(password, passwordEncoder);
   }
 }
