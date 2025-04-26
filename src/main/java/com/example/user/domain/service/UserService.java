@@ -7,13 +7,15 @@ import com.example.user.domain.domain.repository.UserRepository;
 import com.example.user.domain.exception.AlreadyExistsUserEmailException;
 import com.example.user.domain.exception.AlreadyExistsUserIdException;
 import com.example.user.domain.exception.NotFoundUserException;
+import com.example.user.domain.exception.ValidationPasswordException;
 import com.example.user.domain.presentation.dto.request.UserCreateRequest;
-import com.example.user.domain.presentation.dto.request.UserUpdateRequest;
 import com.example.user.domain.presentation.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -54,12 +56,16 @@ public class UserService {
     return userResponse;
   }
 
-  public UserResponse changeById(String userId, UserUpdateRequest updateInfo) {
+  public UserResponse changeProfileById(String userId, String profile) {
     User user = getUserById(userId);
-    String name = updateInfo.name();
-    String profile = updateInfo.profile();
-    String password = updateInfo.password();
-    user.update(name, profile, password, passwordEncoder);
+    user.updateProfile(profile);
+    UserResponse userResponse = toUserResponse(user);
+    return userResponse;
+  }
+
+  public UserResponse changeNameById(String userId, String name) {
+    User user = getUserById(userId);
+    user.updateName(name);
     UserResponse userResponse = toUserResponse(user);
     return userResponse;
   }
@@ -83,6 +89,32 @@ public class UserService {
 
   private UserResponse toUserResponse(User user) {
     return userMapper.toDto(user);
+  }
+
+  public void changePassword(String email, String password) {
+    User user = getUserByEmail(email);
+    user.changeToEncodedPassword(password, passwordEncoder);
+  }
+
+
+  private User getUserByEmail(String email) {
+    User user = userRepository.findUserByEmail(email)
+                    .orElseThrow(() -> new NotFoundUserException("Not found User with email"));
+    return user;
+  }
+
+  public String retrieveUserId(String email, String password) {
+    User user = getUserByEmail(email);
+    validatePassword(password, user);
+    String userId = user.getUserId();
+    return userId;
+  }
+
+  private void validatePassword(String password, User user) {
+    boolean validatePassword = user.equalsPassword(password, passwordEncoder);
+    if (!validatePassword) {
+      throw new ValidationPasswordException("Password is not correct");
+    }
   }
 
 }

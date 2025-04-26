@@ -1,6 +1,5 @@
 package com.example.user.domain.domain;
 
-import com.example.user.domain.presentation.dto.request.UserUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,10 +17,6 @@ import java.time.LocalDateTime;
 @Builder
 public class User {
   @Id
-  @Column(name="user_key")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long userKey;
-  @Column(unique = true, name="user_id")
   private String userId;
   @Column(unique = true)
   private String email;
@@ -44,13 +39,6 @@ public class User {
     return encoder.matches(password, this.password);
   }
 
-
-  public void update(String name, String profile, String password, PasswordEncoder passwordEncoder) {
-    this.name = name;
-    this.profile = profile;
-    changeToEncodedPassword(password, passwordEncoder);
-  }
-
   public void changeToEncodedPassword(String password, PasswordEncoder encoder) {
     String encodedPassword = encoder.encode(password);
     changePassword(encodedPassword);
@@ -58,5 +46,13 @@ public class User {
 
   private void changePassword(String password) {
     this.password = password;
+  }
+
+  public void updateProfile(String profile) {
+    this.profile = profile;
+  }
+
+  public void updateName(String name) {
+    this.name = name;
   }
 }

@@ -9,7 +9,6 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -28,9 +27,11 @@ public class GrpcUserLoginService extends UserLoginServiceGrpc.UserLoginServiceI
       User user = findUserByUserId(userId);
       boolean existsUser = existsUser(user, password, passwordEncoder);
 
+
       UserLoginResponse checkUserResponse = UserLoginResponse.newBuilder()
               .setExistsUser(existsUser)
-              .setUserKey(String.valueOf(user.getUserKey()))
+              .setUserId(String.valueOf(user.getUserId()))
+              .setRole(user.getRole().toString())
               .build();
       responseObserver.onNext(checkUserResponse);
       responseObserver.onCompleted();

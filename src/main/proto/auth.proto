@@ -17,7 +17,8 @@ message UserLoginRequest {
 
 message UserLoginResponse {
   bool existsUser = 1;
-  string userKey = 2;
+  string userId = 2;
+  string role = 3;
 }
 
 // email Validate to register
