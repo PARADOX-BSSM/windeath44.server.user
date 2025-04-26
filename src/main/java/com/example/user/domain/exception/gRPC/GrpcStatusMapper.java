@@ -1,4 +1,4 @@
-package com.example.user.domain.exception;
+package com.example.user.domain.exception.gRPC;
 
 import io.grpc.Status;
 import org.springframework.http.HttpStatus;
@@ -18,8 +18,8 @@ public enum GrpcStatusMapper {
   private final HttpStatus httpStatus;
 
   GrpcStatusMapper(Status.Code code, HttpStatus httpStatus) {
-        this.code = code;
-        this.httpStatus = httpStatus;
+    this.code = code;
+    this.httpStatus = httpStatus;
   }
   public static HttpStatus resolve(Status.Code code) {
     return ERROR_MAP.getOrDefault(code, HttpStatus.INTERNAL_SERVER_ERROR);

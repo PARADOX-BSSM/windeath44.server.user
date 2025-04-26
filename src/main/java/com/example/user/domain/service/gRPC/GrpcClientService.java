@@ -1,10 +1,8 @@
 package com.example.user.domain.service.gRPC;
 
 import com.example.grpc.*;
-import com.example.user.domain.exception.GrpcMappedException;
-import com.example.user.domain.exception.GrpcStatusMapper;
-import com.example.user.domain.exception.NotFoundUserException;
-import com.example.user.domain.presentation.dto.response.UserResponse;
+import com.example.user.domain.exception.gRPC.GrpcMappedException;
+import com.example.user.domain.exception.gRPC.GrpcStatusMapper;
 import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

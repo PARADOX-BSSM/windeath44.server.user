@@ -1,7 +1,8 @@
 package com.example.user.global.exception;
 
 import com.example.user.domain.exception.AlreadyExistsUserException;
-import com.example.user.domain.exception.GrpcMappedException;
+import com.example.user.domain.exception.ValidationPasswordException;
+import com.example.user.domain.exception.gRPC.GrpcMappedException;
 import com.example.user.domain.exception.NotFoundUserException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,14 @@ public class GlobalExceptionHandler {
     return ResponseEntity
             .status(e.getStatus())
             .build();
+  }
+
+  @ExceptionHandler(ValidationPasswordException.class)
+  public ResponseEntity<String> validationPasswordExceptionHandler(ValidationPasswordException e) {
+    String errorMessage = e.getMessage();
+    log.error(errorMessage);
+    return ResponseEntity.status(400)
+            .body(errorMessage);
   }
 
 }
