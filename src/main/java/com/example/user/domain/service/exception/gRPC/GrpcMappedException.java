@@ -1,4 +1,4 @@
-package com.example.user.domain.exception.gRPC;
+package com.example.user.domain.service.exception.gRPC;
 
 import org.springframework.http.HttpStatus;
 

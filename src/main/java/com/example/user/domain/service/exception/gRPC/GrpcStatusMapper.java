@@ -1,4 +1,4 @@
-package com.example.user.domain.exception.gRPC;
+package com.example.user.domain.service.exception.gRPC;
 
 import io.grpc.Status;
 import org.springframework.http.HttpStatus;
@@ -9,7 +9,8 @@ import java.util.stream.Collectors;
 
 
 public enum GrpcStatusMapper {
-  NOT_FOUND(Status.Code.NOT_FOUND, HttpStatus.NOT_FOUND), BAD_REQUEST(Status.Code.FAILED_PRECONDITION, HttpStatus.BAD_REQUEST);
+  NOT_FOUND(Status.Code.NOT_FOUND, HttpStatus.NOT_FOUND),
+  BAD_REQUEST(Status.Code.FAILED_PRECONDITION, HttpStatus.BAD_REQUEST);
 
   private static final Map<Status.Code, HttpStatus> ERROR_MAP = Arrays.stream(values())
           .collect(Collectors.toMap(e -> e.code, e -> e.httpStatus));

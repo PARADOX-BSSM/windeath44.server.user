@@ -9,11 +9,13 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @GrpcService
 @RequiredArgsConstructor
+@Slf4j
 public class GrpcUserLoginService extends UserLoginServiceGrpc.UserLoginServiceImplBase {
   private final PasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
@@ -25,9 +27,9 @@ public class GrpcUserLoginService extends UserLoginServiceGrpc.UserLoginServiceI
       String password = request.getPassword();
 
       User user = findUserByUserId(userId);
-      boolean existsUser = existsUser(user, password, passwordEncoder);
+      boolean existsUser = user.equalsPassword(password, passwordEncoder);
 
-
+      log.warn(String.valueOf(existsUser));
       UserLoginResponse checkUserResponse = UserLoginResponse.newBuilder()
               .setExistsUser(existsUser)
               .setUserId(String.valueOf(user.getUserId()))
@@ -40,9 +42,6 @@ public class GrpcUserLoginService extends UserLoginServiceGrpc.UserLoginServiceI
     }
   }
 
-  private boolean existsUser(User user, String password, PasswordEncoder passwordEncoder) {
-    return user.equalsPassword(password, passwordEncoder);
-  }
 
   private User findUserByUserId(String userId) {
     User user = userRepository.findByUserId(userId)
