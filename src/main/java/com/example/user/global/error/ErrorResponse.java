@@ -1,6 +1,6 @@
 package com.example.user.global.error;
 
-import com.example.user.global.error.Exception.ErrorCode;
+import com.example.user.global.error.exception.ErrorCode;
 
 public record ErrorResponse(
         int status,
