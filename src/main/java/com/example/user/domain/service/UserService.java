@@ -1,7 +1,7 @@
 package com.example.user.domain.service;
 
-import com.example.user.domain.entity.User;
-import com.example.user.domain.entity.UserRole;
+import com.example.user.domain.model.User;
+import com.example.user.domain.model.UserRole;
 import com.example.user.domain.mapper.UserMapper;
 import com.example.user.domain.repository.UserRepository;
 import com.example.user.domain.exception.AlreadyExistsUserEmailException;

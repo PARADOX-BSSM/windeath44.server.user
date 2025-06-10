@@ -2,8 +2,8 @@ package com.example.user.domain.mapper;
 
 import com.example.user.domain.dto.request.UserCreateRequest;
 import com.example.user.domain.dto.response.UserResponse;
-import com.example.user.domain.entity.User;
-import com.example.user.domain.entity.UserRole;
+import com.example.user.domain.model.User;
+import com.example.user.domain.model.UserRole;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;

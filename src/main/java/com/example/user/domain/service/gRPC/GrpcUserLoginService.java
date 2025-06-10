@@ -3,7 +3,7 @@ package com.example.user.domain.service.gRPC;
 import com.example.grpc.UserLoginRequest;
 import com.example.grpc.UserLoginResponse;
 import com.example.grpc.UserLoginServiceGrpc;
-import com.example.user.domain.entity.User;
+import com.example.user.domain.model.User;
 import com.example.user.domain.repository.UserRepository;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
