@@ -1,13 +1,12 @@
 package com.example.user.global.error;
 
-import com.example.user.domain.service.exception.gRPC.GrpcMappedException;
-import com.example.user.global.error.Exception.ErrorCode;
-import com.example.user.global.error.Exception.GlobalException;
+import com.example.user.domain.exception.gRPC.GrpcMappedException;
+import com.example.user.global.error.exception.ErrorCode;
+import com.example.user.global.error.exception.GlobalException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice

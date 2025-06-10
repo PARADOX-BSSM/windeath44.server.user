@@ -1,15 +1,15 @@
 package com.example.user.domain.service;
 
-import com.example.user.domain.domain.User;
-import com.example.user.domain.domain.UserRole;
-import com.example.user.domain.domain.mapper.UserMapper;
-import com.example.user.domain.domain.repository.UserRepository;
-import com.example.user.domain.service.exception.AlreadyExistsUserEmailException;
-import com.example.user.domain.service.exception.AlreadyExistsUserIdException;
-import com.example.user.domain.service.exception.NotFoundUserException;
-import com.example.user.domain.service.exception.ValidationPasswordException;
-import com.example.user.domain.presentation.dto.request.UserCreateRequest;
-import com.example.user.domain.presentation.dto.response.UserResponse;
+import com.example.user.domain.model.User;
+import com.example.user.domain.model.UserRole;
+import com.example.user.domain.mapper.UserMapper;
+import com.example.user.domain.repository.UserRepository;
+import com.example.user.domain.exception.AlreadyExistsUserEmailException;
+import com.example.user.domain.exception.AlreadyExistsUserIdException;
+import com.example.user.domain.exception.NotFoundUserException;
+import com.example.user.domain.exception.ValidationPasswordException;
+import com.example.user.domain.dto.request.UserCreateRequest;
+import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
