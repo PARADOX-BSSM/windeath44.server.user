@@ -1,4 +1,4 @@
-package com.example.user.domain.presentation.dto.response;
+package com.example.user.domain.dto.response;
 
 public record UserResponse (
         String userId,

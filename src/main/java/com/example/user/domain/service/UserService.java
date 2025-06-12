@@ -1,20 +1,17 @@
 package com.example.user.domain.service;
 
-import com.example.user.domain.domain.User;
-import com.example.user.domain.domain.UserRole;
-import com.example.user.domain.domain.mapper.UserMapper;
-import com.example.user.domain.domain.repository.UserRepository;
+import com.example.user.domain.model.User;
+import com.example.user.domain.model.UserRole;
+import com.example.user.domain.mapper.UserMapper;
+import com.example.user.domain.repository.UserRepository;
 import com.example.user.domain.exception.AlreadyExistsUserEmailException;
 import com.example.user.domain.exception.AlreadyExistsUserIdException;
 import com.example.user.domain.exception.NotFoundUserException;
 import com.example.user.domain.exception.ValidationPasswordException;
-import com.example.user.domain.presentation.dto.request.UserCreateRequest;
-import com.example.user.domain.presentation.dto.response.UserResponse;
+import com.example.user.domain.dto.request.UserCreateRequest;
+import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,20 +39,22 @@ public class UserService {
   private void checkExistsUser(String userId, String email) {
     boolean existsUserById = userRepository.existsByUserId(userId);
     if (existsUserById) {
-      throw new AlreadyExistsUserIdException("UserId already exists");
+      throw AlreadyExistsUserIdException.getInstance();
     }
 
     boolean existsUserByEmail = userRepository.existsUserByEmail(email);
     if (existsUserByEmail) {
-      throw new AlreadyExistsUserEmailException("UserEmail already exists");
+      throw AlreadyExistsUserEmailException.getInstance();
     }
   }
+
   public UserResponse findById(String userId) {
     User user = getUserById(userId);
     UserResponse userResponse = toUserResponse(user);
     return userResponse;
   }
 
+  @Transactional
   public UserResponse changeProfileById(String userId, String profile) {
     User user = getUserById(userId);
     user.updateProfile(profile);
@@ -63,6 +62,7 @@ public class UserService {
     return userResponse;
   }
 
+  @Transactional
   public UserResponse changeNameById(String userId, String name) {
     User user = getUserById(userId);
     user.updateName(name);
@@ -72,7 +72,7 @@ public class UserService {
 
   private User getUserById(String userId) {
     User user = userRepository.findByUserId(userId)
-            .orElseThrow(() -> new NotFoundUserException("Not found user with id"));
+            .orElseThrow(NotFoundUserException::getInstance);
     return user;
   }
 
@@ -91,6 +91,7 @@ public class UserService {
     return userMapper.toDto(user);
   }
 
+  @Transactional
   public void changePassword(String email, String password) {
     User user = getUserByEmail(email);
     user.changeToEncodedPassword(password, passwordEncoder);
@@ -99,7 +100,7 @@ public class UserService {
 
   private User getUserByEmail(String email) {
     User user = userRepository.findUserByEmail(email)
-                    .orElseThrow(() -> new NotFoundUserException("Not found User with email"));
+                    .orElseThrow(NotFoundUserException::getInstance);
     return user;
   }
 
@@ -113,7 +114,7 @@ public class UserService {
   private void validatePassword(String password, User user) {
     boolean validatePassword = user.equalsPassword(password, passwordEncoder);
     if (!validatePassword) {
-      throw new ValidationPasswordException("Password is not correct");
+      throw ValidationPasswordException.getInstance();
     }
   }
 

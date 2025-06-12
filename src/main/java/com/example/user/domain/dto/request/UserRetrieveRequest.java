@@ -1,4 +1,4 @@
-package com.example.user.domain.presentation.dto.request;
+package com.example.user.domain.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
