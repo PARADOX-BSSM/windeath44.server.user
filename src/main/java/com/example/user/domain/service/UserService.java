@@ -1,20 +1,22 @@
 package com.example.user.domain.service;
 
+import com.example.user.domain.exception.*;
 import com.example.user.domain.model.User;
 import com.example.user.domain.model.UserRole;
 import com.example.user.domain.mapper.UserMapper;
 import com.example.user.domain.repository.UserRepository;
-import com.example.user.domain.exception.AlreadyExistsUserEmailException;
-import com.example.user.domain.exception.AlreadyExistsUserIdException;
-import com.example.user.domain.exception.NotFoundUserException;
-import com.example.user.domain.exception.ValidationPasswordException;
 import com.example.user.domain.dto.request.UserCreateRequest;
 import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
+import com.example.user.global.storage.FileStorage;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ public class UserService {
   private final GrpcClientService grpcClientService;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
+  private final FileStorage fileStorage;
 
   @Transactional
   public void register(UserCreateRequest request) {
@@ -55,9 +58,15 @@ public class UserService {
   }
 
   @Transactional
-  public UserResponse changeProfileById(String userId, String profile) {
+  public UserResponse changeProfileById(String userId, MultipartFile profile) {
     User user = getUserById(userId);
-    user.updateProfile(profile);
+    String imageUrl;
+    try {
+      imageUrl = fileStorage.upload(userId, profile);
+    } catch (IOException e) {
+      throw FailedUploadFileException.getInstance();
+    }
+    user.updateProfile(imageUrl);
     UserResponse userResponse = toUserResponse(user);
     return userResponse;
   }
