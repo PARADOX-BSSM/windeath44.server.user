@@ -93,7 +93,6 @@ public class UserService {
   private User toUser(UserCreateRequest request) {
     User user = userMapper.toEntity(request, UserRole.USER);
     return user;
-
   }
 
   private UserResponse toUserResponse(User user) {
