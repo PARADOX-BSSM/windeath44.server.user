@@ -20,10 +20,11 @@ grpc:
       address: ${GRPC_AUTH_SERVER_ADDRESS}
       negotiationType: "plaintext"
 storage:
-  bucket-name : ${STORAGE_BUCKET_NAME}
-  namespace-name : ${STORAGE_NAMESPACE}
-  configuration-file-path : ~/.oci/config
-  profile : DEFAULT
+  access-key: ${STORAGE_ACCESS_KEY}
+  secret-key: ${STORAGE_SECRET_KEY}
+  bucket-name: ${STORAGE_BUCKET_NAME}
+  region: ap-northeast-2
+
 
 server:
   port:

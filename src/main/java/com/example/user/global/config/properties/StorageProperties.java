@@ -8,8 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties("storage")
 public class StorageProperties {
+  private String accessKey;
+  private String secretKey;
   private String bucketName;
-  private String namespaceName;
-  private String  configurationFilePath;
-  private String profile;
+  private String region;
 }
