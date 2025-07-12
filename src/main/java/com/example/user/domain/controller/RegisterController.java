@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/users")
 public class RegisterController {
   private final UserService userService;
   private final ResponseDtoMapper responseDtoMapper;
