@@ -20,9 +20,9 @@ public class LoggingAspect {
 
     @Around("userServiceMethodLogging()")
     public Object serviceMethodLogging(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.trace("Entering {} by {}", joinPoint.getSignature().getName(), counter.get());
+        log.debug("Entering {} by {}", joinPoint.getSignature().getName(), counter.get());
         Object result = joinPoint.proceed();
-        log.trace("Exiting {} by {}", joinPoint.getSignature().getName(), counter.getAndIncrement());
+        log.debug("Exiting {} by {}", joinPoint.getSignature().getName(), counter.getAndIncrement());
         return result;
     }
 }
