@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -130,7 +131,7 @@ public class UserServiceUnitTest {
   void when_valid_userId_then_changeProfileById_user_successfully() {
     // Given
     String userId = "test";
-    String profile = "new_profile.png";
+    MultipartFile profile = mock(MultipartFile.class);
     User user = mock(User.class);
     UserResponse userResponse = mock(UserResponse.class);
     given(userRepository.findByUserId(userId)).willReturn(Optional.of(user));
@@ -141,7 +142,7 @@ public class UserServiceUnitTest {
 
     // Then
     assertEquals(userResponse, result);
-    then(user).should().updateProfile(profile);
+    then(user).should().updateProfile(profile.toString());
     then(userMapper).should().toDto(user);
   }
 
