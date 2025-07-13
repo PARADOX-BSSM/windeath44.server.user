@@ -15,6 +15,7 @@ grpc:
     address: ${GRPC_SERVER_ADDRESS}
     port: ${GRPC_SERVER_PORT}
 
+
   client:
     auth-server:
       address: ${GRPC_AUTH_SERVER_ADDRESS}
@@ -29,3 +30,6 @@ storage:
 server:
   port:
     ${SERVER_PORT}
+logging:
+  level:
+    com.example.user: trace
