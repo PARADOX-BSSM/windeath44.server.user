@@ -35,7 +35,8 @@ public class User {
   @PrePersist
   public void defaultSettings() {
     this.remain_token = 0L;
-    this.profile = "Default.png";
+    String defaultImage = "https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3396.jpg?semt=ais_hybrid&w=740";
+    this.profile = defaultImage;
   }
 
   public boolean equalsPassword(String password, PasswordEncoder encoder) {
