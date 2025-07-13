@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class User {
   @Id
   private String userId;
@@ -26,13 +29,13 @@ public class User {
   private UserRole role;
   private Long remain_token;
   private String profile;
-  @CreationTimestamp
+  @CreatedDate
   private LocalDateTime created_at;
 
   @PrePersist
   public void defaultSettings() {
-    if (this.remain_token == null) this.remain_token = 0L;
-    if (this.profile == null) this.profile = "Default.png";
+    this.remain_token = 0L;
+    this.profile = "Default.png";
   }
 
   public boolean equalsPassword(String password, PasswordEncoder encoder) {
