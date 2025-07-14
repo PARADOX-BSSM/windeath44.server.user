@@ -1,6 +1,7 @@
 package com.example.user.domain.mapper;
 
 import com.example.user.domain.dto.request.UserCreateRequest;
+import com.example.user.domain.dto.response.UserIdResponse;
 import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.model.User;
 import com.example.user.domain.model.UserRole;
@@ -15,4 +16,6 @@ public interface UserMapper {
   User toEntity(UserCreateRequest request, UserRole role);
 
   UserResponse toDto(User user);
+
+  UserIdResponse toUserIdResponse(User user);
 }

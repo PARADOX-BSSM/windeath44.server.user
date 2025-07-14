@@ -9,8 +9,6 @@ import com.example.user.domain.exception.AlreadyExistsUserIdException;
 import com.example.user.domain.exception.NotFoundUserException;
 import com.example.user.domain.exception.ValidationPasswordException;
 import com.example.user.domain.dto.request.UserCreateRequest;
-import com.example.user.domain.dto.request.UserNameUpdateRequest;
-import com.example.user.domain.dto.request.UserProfileUpdateRequest;
 import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 

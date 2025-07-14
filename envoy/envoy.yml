@@ -31,6 +31,8 @@ static_resources:
                             cluster: user-service
                 http_filters:
                   - name: envoy.filters.http.cors
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
                   - name: envoy.filters.http.ext_authz
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
@@ -55,9 +57,8 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: ${SERVER_IP}
+                      address: 10.129.57.45
                       port_value: 4445
-
     - name: auth-service
       connect_timeout: 0.5s
       type: logical_dns
@@ -70,5 +71,5 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: ${SERVER_IP}
+                      address: 10.129.57.45
                       port_value: 9001
