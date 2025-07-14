@@ -1,6 +1,5 @@
 package com.example.user.domain.controller;
 
-import com.example.user.global.mapper.ResponseDtoMapper;
 import com.example.user.domain.dto.request.UserNameUpdateRequest;
 import com.example.user.domain.dto.request.UserProfileUpdateRequest;
 
@@ -33,6 +32,7 @@ public class UserController {
     ResponseDto<UserResponse> responseDto = HttpUtil.success("change profile", userResponse);
     return ResponseEntity.ok(responseDto);
   }
+
   @PatchMapping("/change/name")
   public ResponseEntity<ResponseDto<UserResponse>> changeNameById(@RequestHeader("user-id") String userId, @RequestBody @Valid UserNameUpdateRequest request) {
     UserResponse userResponse = userService.changeNameById(userId, request.name());
