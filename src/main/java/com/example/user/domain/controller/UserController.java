@@ -1,6 +1,5 @@
 package com.example.user.domain.controller;
 
-import com.example.user.global.mapper.ResponseDtoMapper;
 import com.example.user.domain.dto.request.UserNameUpdateRequest;
 import com.example.user.domain.dto.request.UserProfileUpdateRequest;
 
