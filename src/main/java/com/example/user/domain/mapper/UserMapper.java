@@ -6,6 +6,8 @@ import com.example.user.domain.model.User;
 import com.example.user.domain.model.UserRole;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.springframework.stereotype.Component;
 
 @Component
