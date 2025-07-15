@@ -1,8 +1,6 @@
 package com.example.user.domain.controller;
 
-import com.example.user.global.mapper.ResponseDtoMapper;
 import com.example.user.domain.dto.request.UserNameUpdateRequest;
-import com.example.user.domain.dto.request.UserProfileUpdateRequest;
 
 import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.UserService;
@@ -13,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,11 +27,12 @@ public class UserController {
   }
 
   @PatchMapping("/change/profile")
-  public ResponseEntity<ResponseDto<UserResponse>> changeProfileById(@RequestHeader("user-id") String userId, @RequestBody @Valid UserProfileUpdateRequest request) {
-    UserResponse userResponse = userService.changeProfileById(userId, request.profile());
+  public ResponseEntity<ResponseDto<UserResponse>> changeProfileById(@RequestHeader("user-id") String userId, @RequestParam MultipartFile profile) {
+    UserResponse userResponse = userService.changeProfileById(userId, profile);
     ResponseDto<UserResponse> responseDto = HttpUtil.success("change profile", userResponse);
     return ResponseEntity.ok(responseDto);
   }
+
   @PatchMapping("/change/name")
   public ResponseEntity<ResponseDto<UserResponse>> changeNameById(@RequestHeader("user-id") String userId, @RequestBody @Valid UserNameUpdateRequest request) {
     UserResponse userResponse = userService.changeNameById(userId, request.name());

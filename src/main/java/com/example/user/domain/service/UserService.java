@@ -1,5 +1,6 @@
 package com.example.user.domain.service;
 
+import com.example.user.domain.dto.response.UserIdResponse;
 import com.example.user.domain.exception.*;
 import com.example.user.domain.model.User;
 import com.example.user.domain.model.UserRole;
@@ -112,11 +113,11 @@ public class UserService {
     return user;
   }
 
-  public String retrieveUserId(String email, String password) {
+  public UserIdResponse retrieveUserId(String email, String password) {
     User user = getUserByEmail(email);
     validatePassword(password, user);
-    String userId = user.getUserId();
-    return userId;
+    UserIdResponse userIdResponse = userMapper.toUserIdResponse(user);
+    return userIdResponse;
   }
 
   private void validatePassword(String password, User user) {
