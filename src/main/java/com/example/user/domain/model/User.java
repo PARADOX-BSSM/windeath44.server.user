@@ -29,7 +29,7 @@ public class User {
   private Long remainToken;
   private String profile;
   @CreatedDate
-  private LocalDateTime created_at;
+  private LocalDateTime createdAt;
 
   @PrePersist
   public void defaultSettings() {
