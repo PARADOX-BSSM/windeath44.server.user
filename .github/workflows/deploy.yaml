@@ -43,7 +43,7 @@ jobs:
       - name: Clone manifests repository
         run: |
           git clone https://x-access-token:${{ secrets.MANIFESTS_REPO_TOKEN }}@github.com/PARADOX-BSSM/windeath44.manifest.user.git
-          cd windeath44.manifest.auth
+          cd windeath44.manifest.user
           git config user.name "${{ secrets.GIT_USERNAME }}"
           git config user.email "${{ secrets.GIT_EMAIL }}"
 
