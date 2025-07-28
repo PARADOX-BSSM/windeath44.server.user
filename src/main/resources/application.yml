@@ -15,11 +15,21 @@ grpc:
     address: ${GRPC_SERVER_ADDRESS}
     port: ${GRPC_SERVER_PORT}
 
+
   client:
     auth-server:
       address: ${GRPC_AUTH_SERVER_ADDRESS}
       negotiationType: "plaintext"
+storage:
+  access-key: ${STORAGE_ACCESS_KEY}
+  secret-key: ${STORAGE_SECRET_KEY}
+  bucket-name: ${STORAGE_BUCKET_NAME}
+  region: ap-northeast-2
+
 
 server:
   port:
     ${SERVER_PORT}
+logging:
+  level:
+    com.example.user: trace

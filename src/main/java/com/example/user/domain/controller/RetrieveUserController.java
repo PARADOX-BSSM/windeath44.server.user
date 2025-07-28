@@ -1,9 +1,10 @@
 package com.example.user.domain.controller;
 
-import com.example.user.global.mapper.ResponseDtoMapper;
 import com.example.user.domain.dto.request.UserRetrieveRequest;
-import com.example.user.global.mapper.dto.ResponseDto;
+import com.example.user.domain.dto.response.UserIdResponse;
+import com.example.user.global.dto.ResponseDto;
 import com.example.user.domain.service.UserService;
+import com.example.user.global.util.HttpUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,22 +16,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users/retrieve")
 public class RetrieveUserController {
   private final UserService userService;
-  private final ResponseDtoMapper responseDtoMapper;
 
   @PatchMapping("/password")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public ResponseEntity<ResponseDto<Void>> changePassword(@RequestBody @Valid UserRetrieveRequest request) {
     userService.changePassword(request.email(), request.password());
-    ResponseDto<Void> responseDto = responseDtoMapper.toResponseDto("change password", null);
+    ResponseDto<Void> responseDto = HttpUtil.success("change password");
     return ResponseEntity
             .status(HttpStatus.ACCEPTED)
             .body(responseDto);
   }
 
   @PostMapping("/userId")
-  public ResponseEntity<ResponseDto<String>> retrieveUserId(@RequestBody @Valid UserRetrieveRequest request) {
-    String userId = userService.retrieveUserId(request.email(), request.password());
-    ResponseDto<String> responseDto = responseDtoMapper.toResponseDto("retrieve userId", userId);
+  public ResponseEntity<ResponseDto<UserIdResponse>> retrieveUserId(@RequestBody @Valid UserRetrieveRequest request) {
+    UserIdResponse userIdResponse = userService.retrieveUserId(request.email(), request.password());
+    ResponseDto<UserIdResponse> responseDto = HttpUtil.success("retrieve userId", userIdResponse);
     return ResponseEntity.ok(responseDto);
   }
 
