@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,14 +26,14 @@ public class User {
   private String password;
   @Enumerated(EnumType.STRING)
   private UserRole role;
-  private Long remain_token;
+  private Long remainToken;
   private String profile;
   @CreatedDate
-  private LocalDateTime created_at;
+  private LocalDateTime createdAt;
 
   @PrePersist
   public void defaultSettings() {
-    this.remain_token = 0L;
+    this.remainToken = 0L;
     String defaultImage = "https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3396.jpg?semt=ais_hybrid&w=740";
     this.profile = defaultImage;
   }
