@@ -2,6 +2,7 @@ package com.example.user.domain.controller;
 
 import com.example.user.domain.dto.request.UserNameUpdateRequest;
 
+import com.example.user.domain.dto.response.MyUserResponse;
 import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.UserService;
 import com.example.user.global.dto.ResponseDto;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/users")
 public class UserController {
   private final UserService userService;
+
 
   @GetMapping("/profile")
   public ResponseEntity<ResponseDto<UserResponse>> findUserById(@RequestHeader("user-id") String userId) {
