@@ -28,6 +28,10 @@ public class UserService {
   private final UserMapper userMapper;
   private final FileStorage fileStorage;
 
+  public void getMe() {
+
+  }
+
   @Transactional
   public void register(UserCreateRequest request) {
     String userId = request.userId();
@@ -83,6 +87,7 @@ public class UserService {
   private User getUserById(String userId) {
     User user = userRepository.findByUserId(userId)
             .orElseThrow(NotFoundUserException::getInstance);
+    
     return user;
   }
 
