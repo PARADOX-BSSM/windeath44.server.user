@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -21,6 +23,7 @@ public class UserController {
 
   @GetMapping("/profile")
   public ResponseEntity<ResponseDto<UserResponse>> findUserById(@RequestHeader("user-id") String userId) {
+    userId = userId.substring(2, userId.length() - 2);
     UserResponse userResponse = userService.findById(userId);
     ResponseDto<UserResponse> responseDto = HttpUtil.success("find user", userResponse);
     return ResponseEntity.ok(responseDto);
@@ -28,12 +31,14 @@ public class UserController {
 
   @PatchMapping("/change/profile")
   public ResponseEntity<ResponseDto<UserResponse>> changeProfileById(@RequestHeader("user-id") String userId, @RequestBody @Valid UserProfileUpdateRequest request) {
+    userId = userId.substring(2, userId.length() - 2);
     UserResponse userResponse = userService.changeProfileById(userId, request.profile());
     ResponseDto<UserResponse> responseDto = HttpUtil.success("change profile", userResponse);
     return ResponseEntity.ok(responseDto);
   }
   @PatchMapping("/change/name")
   public ResponseEntity<ResponseDto<UserResponse>> changeNameById(@RequestHeader("user-id") String userId, @RequestBody @Valid UserNameUpdateRequest request) {
+    userId = userId.substring(2, userId.length() - 2);
     UserResponse userResponse = userService.changeNameById(userId, request.name());
     ResponseDto<UserResponse> responseDto = HttpUtil.success("change name", userResponse);
     return ResponseEntity.ok(responseDto);
@@ -42,6 +47,7 @@ public class UserController {
   @DeleteMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public ResponseEntity<ResponseDto<Void>> deleteUserById(@RequestHeader("user-id") String userId) {
+    userId = userId.substring(2, userId.length() - 2);
     userService.deleteById(userId);
     ResponseDto<Void> responseDto = HttpUtil.success("delete user");
     return ResponseEntity

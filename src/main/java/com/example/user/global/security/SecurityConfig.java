@@ -19,7 +19,6 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain servletFilterChain(HttpSecurity http) throws Exception {
     http
-            .cors(AbstractHttpConfigurer::disable)
             .csrf(AbstractHttpConfigurer::disable);
 
     http

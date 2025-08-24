@@ -1,5 +1,5 @@
 # 1단계: Gradle로 Spring Boot 애플리케이션 빌드
-FROM --platform=linux/arm64 gradle:8.4-jdk17 AS build
+FROM gradle:8.4-jdk17 AS build
 WORKDIR /app
 
 # Gradle 캐시 최적화를 위해 의존성 먼저 복사
@@ -12,7 +12,7 @@ COPY . .
 RUN gradle bootJar --no-daemon
 
 # 2단계: 런타임 스테이지 (경량 JDK 환경에서 애플리케이션 실행)
-FROM --platform=linux/arm64 openjdk:17-jdk
+FROM openjdk:17-jdk
 
 WORKDIR /app
 
