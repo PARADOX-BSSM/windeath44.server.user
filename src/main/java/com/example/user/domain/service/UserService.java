@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,9 +30,14 @@ public class UserService {
   private final UserMapper userMapper;
   private final FileStorage fileStorage;
 
-  public void getMe() {
-
+  public List<UserResponse> findAllByIds(List<String> userIds) {
+    List<UserResponse> userResponseList = userRepository.findByUserIds(userIds)
+            .stream()
+            .map(userMapper::toDto)
+            .toList();
+    return userResponseList;
   }
+
 
   @Transactional
   public void register(UserCreateRequest request) {
