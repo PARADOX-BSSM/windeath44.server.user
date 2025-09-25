@@ -34,7 +34,7 @@ public class User {
   @PrePersist
   public void defaultSettings() {
     this.remainToken = 0L;
-    String defaultImage = "https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3396.jpg?semt=ais_hybrid&w=740";
+    String defaultImage = "https://windeath44.s3.ap-northeast-2.amazonaws.com/seori_profile.png";
     this.profile = defaultImage;
   }
 
