@@ -22,31 +22,30 @@ public class KafkaEventListener {
     public void handleTokenDecreaseRequest(ChatEvent request) {
         log.info("토큰 감소 요청 수신 - userId: {}, tokenCount: {}", request.getUserId(), request.getTotalTokenCount());
 
-        RemainTokenDecreaseResponse response;
-
         try {
             Long remainingToken = tokenDecreaseService.decreaseToken(
                     request.getUserId(),
                     request.getTotalTokenCount()
             );
 
-            response = getBuild(request, true, remainingToken, null);
-
+            RemainTokenDecreaseResponse response = buildResponse(request.getUserId(), true, remainingToken, null);
+            kafkaProducer.send("remain-token-decrease-response", response);
+            
             log.info("토큰 감소 성공 - userId: {}, remainingToken: {}", request.getUserId(), remainingToken);
 
         } catch (Exception e) {
             log.error("토큰 감소 실패 - userId: {}, error: {}", request.getUserId(), e.getMessage(), e);
 
-            response = getBuild(request, false, null, e.getMessage());
+            RemainTokenDecreaseResponse response = buildResponse(request.getUserId(), false, null, e.getMessage());
+            kafkaProducer.send("remain-token-decrease-fail-response", response);
+            
+            log.info("토큰 감소 실패 응답 발송 완료 - userId: {}", request.getUserId());
         }
-
-        kafkaProducer.send("remain-token-decrease-response", response);
-        log.info("토큰 감소 응답 발송 완료 - userId: {}, success: {}", request.getUserId(), response.getSuccess());
     }
 
-    private static RemainTokenDecreaseResponse getBuild(ChatEvent event, boolean success, Long remainingToken, String errorMessage) {
+    private static RemainTokenDecreaseResponse buildResponse(String userId, boolean success, Long remainingToken, String errorMessage) {
         return RemainTokenDecreaseResponse.newBuilder()
-                .setUserId(event.getUserId())
+                .setUserId(userId)
                 .setSuccess(success)
                 .setRemainingToken(remainingToken)
                 .setErrorMessage(errorMessage)
