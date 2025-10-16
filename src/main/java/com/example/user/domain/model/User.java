@@ -1,5 +1,6 @@
 package com.example.user.domain.model;
 
+import com.example.user.domain.exception.InsufficientRemainTokenException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,5 +58,17 @@ public class User {
 
   public void updateName(String name) {
     this.name = name;
+  }
+
+  public void decreaseToken(int tokenCount) {
+    boolean canDecreaseRemainToken = this.remainToken >= tokenCount;
+
+    if (!canDecreaseRemainToken) throw InsufficientRemainTokenException.getInstance();
+
+    this.remainToken -= tokenCount;
+  }
+
+  public void increaseToken(Long tokenCount) {
+    this.remainToken += tokenCount;
   }
 }
