@@ -1,0 +1,13 @@
+{
+"type": "record",
+    "namespace": "com.example.user.avro",
+    "name": "UserAvro",
+    "fields": [
+        { "name": "userId", "type": "string" },
+        { "name": "email", "type": "string" },
+        { "name": "name", "type": "string" },
+        { "name": "role", "type": "string" },
+        { "name": "remainToken", "type": "long"},
+        { "name": "profile", "type": "string" }
+    ]
+}
