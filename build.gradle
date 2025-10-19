@@ -2,10 +2,14 @@
 plugins {
     id 'java'
     id 'com.google.protobuf' version '0.9.4'
+    id 'com.github.davidmc24.gradle.plugin.avro' version '1.9.1'
     id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.4'
 }
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+    maven { url "https://packages.confluent.io/maven" }
+}
 dependencies {
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -46,7 +50,29 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.5'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+
+    // Kafka + Avro
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    implementation 'io.confluent:kafka-avro-serializer:7.4.0'
+    implementation 'org.apache.avro:avro:1.11.1'
 }
+
+avro {
+    stringType = "String"
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += 'build/generated-main-avro-java'
+            srcDirs += 'build/generated/source/proto/main/grpc'
+            srcDirs += 'build/generated/source/proto/main/java'
+        }
+    }
+}
+
+compileJava.dependsOn tasks.named('generateAvroJava'), tasks.named('generateProto')
 
 java {
     toolchain {

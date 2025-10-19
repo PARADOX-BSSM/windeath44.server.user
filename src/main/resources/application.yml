@@ -10,6 +10,25 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
+  kafka:
+    bootstrap-servers: ${KAFKA_URL}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        schema.registry.url: ${SCHEMA_REGISTRY_URL}
+
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      group-id: user
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        schema.registry.url: ${SCHEMA_REGISTRY_URL}
+        specific.avro.reader: true
+
 grpc:
   server:
     address: ${GRPC_SERVER_ADDRESS}
@@ -25,6 +44,7 @@ storage:
   secret-key: ${STORAGE_SECRET_KEY}
   bucket-name: ${STORAGE_BUCKET_NAME}
   region: ap-northeast-2
+
 
 
 server:
