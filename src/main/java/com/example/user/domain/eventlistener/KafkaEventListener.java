@@ -1,8 +1,6 @@
 package com.example.user.domain.eventlistener;
 
-import com.chatbot.events.ChatEvent;
-import com.example.user.avro.RemainTokenDecreaseResponse;
-import com.example.user.avro.RemainTokenIncreaseResponse;
+import windeath44.server.chatbot.avro.ChatAvroSchema;
 import com.example.user.domain.service.TokenDecreaseService;
 import com.example.user.domain.service.TokenIncreaseService;
 import com.example.user.global.infrastructure.KafkaProducer;
@@ -12,6 +10,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import windeath44.server.memorial.avro.MemorialBowedAvroSchema;
+import windeath44.server.user.avro.RemainTokenDecreaseResponse;
+import windeath44.server.user.avro.RemainTokenIncreaseResponse;
 
 @Slf4j
 @Component
@@ -23,7 +23,7 @@ public class KafkaEventListener {
 
     @KafkaListener(topics = "remain-token-decrease-request", groupId = "user")
     @Transactional
-    public void handleTokenDecreaseRequest(ChatEvent request) {
+    public void handleTokenDecreaseRequest(ChatAvroSchema request) {
         log.info("토큰 감소 요청 수신 - userId: {}, tokenCount: {}", request.getUserId(), request.getTotalTokenCount());
 
         try {

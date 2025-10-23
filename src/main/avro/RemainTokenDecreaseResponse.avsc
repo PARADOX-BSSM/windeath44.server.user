@@ -1,7 +1,7 @@
 {
   "type": "record",
   "name": "RemainTokenDecreaseResponse",
-  "namespace": "com.example.user.avro",
+  "namespace": "windeath44.server.user.avro",
   "doc": "토큰 감소 응답 스키마",
   "fields": [
     {

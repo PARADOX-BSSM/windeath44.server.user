@@ -1,7 +1,7 @@
 {
   "type": "record",
   "name": "RemainTokenIncreaseResponse",
-  "namespace": "com.example.user.avro",
+  "namespace": "windeath44.server.user.avro",
   "doc": "토큰 증가 응답 스키마",
   "fields": [
     {
