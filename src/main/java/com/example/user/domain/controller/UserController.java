@@ -22,7 +22,6 @@ import java.util.List;
 public class UserController {
   private final UserService userService;
 
-
   @GetMapping
   public ResponseEntity<ResponseDto<List<UserResponse>>> getUsersByIds(@RequestParam("userIds") List<String> userIds) {
     List<UserResponse> userResponsesList = userService.findAllByIds(userIds);

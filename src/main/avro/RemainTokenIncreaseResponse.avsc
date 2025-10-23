@@ -1,0 +1,30 @@
+{
+  "type": "record",
+  "name": "RemainTokenIncreaseResponse",
+  "namespace": "com.example.user.avro",
+  "doc": "토큰 증가 응답 스키마",
+  "fields": [
+    {
+      "name": "user_id",
+      "type": "string",
+      "doc": "사용자 ID"
+    },
+    {
+      "name": "success",
+      "type": "boolean",
+      "doc": "토큰 증가 성공 여부"
+    },
+    {
+      "name": "remaining_token",
+      "type": ["null", "long"],
+      "default": null,
+      "doc": "남은 토큰 수 (성공 시)"
+    },
+    {
+      "name": "error_message",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "에러 발생 시 에러 메시지"
+    }
+  ]
+}
