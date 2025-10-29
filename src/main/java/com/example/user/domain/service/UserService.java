@@ -11,6 +11,7 @@ import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
 import com.example.user.global.storage.FileStorage;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,14 +42,7 @@ public class UserService {
 
   @Transactional
   public void register(UserCreateRequest request) {
-    String userId = request.userId();
-    String email = request.email();
-
-    grpcClientService.validateEmail(email);
-    checkExistsUser(userId, email);
-    User user = toUser(request);
-    user.changeToEncodedPassword(request.password(), passwordEncoder);
-    userRepository.save(user);
+    registerUser(request, UserRole.USER);
   }
 
   private void checkExistsUser(String userId, String email) {
@@ -103,8 +97,8 @@ public class UserService {
     userRepository.delete(user);
   }
 
-  private User toUser(UserCreateRequest request) {
-    User user = userMapper.toEntity(request, UserRole.USER);
+  private User toUser(UserCreateRequest request, UserRole role) {
+    User user = userMapper.toEntity(request, role);
     return user;
   }
 
@@ -139,4 +133,19 @@ public class UserService {
     }
   }
 
+  @Transactional
+  public void registerAdmin(@Valid UserCreateRequest request) {
+    registerUser(request, UserRole.ADMIN);
+  }
+
+  private void registerUser(UserCreateRequest request, UserRole role) {
+    String userId = request.userId();
+    String email = request.email();
+
+    grpcClientService.validateEmail(email);
+    checkExistsUser(userId, email);
+    User user = toUser(request, role);
+    user.changeToEncodedPassword(request.password(), passwordEncoder);
+    userRepository.save(user);
+  }
 }
