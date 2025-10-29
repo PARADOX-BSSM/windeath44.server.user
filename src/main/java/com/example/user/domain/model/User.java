@@ -71,4 +71,8 @@ public class User {
   public void increaseToken(Long tokenCount) {
     this.remainToken += tokenCount;
   }
+
+  public boolean isAdmin() {
+    return this.role.equals(UserRole.ADMIN);
+  }
 }

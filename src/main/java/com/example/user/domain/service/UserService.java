@@ -134,8 +134,15 @@ public class UserService {
   }
 
   @Transactional
-  public void registerAdmin(@Valid UserCreateRequest request) {
+  public void registerAdmin(String userId, UserCreateRequest request) {
+    User user = getUserById(userId);
+    validateAdmin(user);
     registerUser(request, UserRole.ADMIN);
+  }
+
+  private static void validateAdmin(User user) {
+    boolean isAdmin = user.isAdmin();
+    if (!isAdmin) throw NotAdminException.getInstance();
   }
 
   private void registerUser(UserCreateRequest request, UserRole role) {
