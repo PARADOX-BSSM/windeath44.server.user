@@ -52,7 +52,6 @@ public class UserController {
   }
 
   @DeleteMapping
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   public ResponseEntity<ResponseDto<Void>> deleteUserById(@RequestHeader("user-id") String userId) {
     userService.deleteById(userId);
     ResponseDto<Void> responseDto = HttpUtil.success("delete user");
