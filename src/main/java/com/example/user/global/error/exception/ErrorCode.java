@@ -11,7 +11,8 @@ public enum ErrorCode {
   USER_NOT_FOUND(404, "User not found"),
   PASSWORD_VALIDATION_FAILED(400, "Password validation failed"),
   FILE_UPLOAD_FAILED(500, "File upload failed"),
-  REMAIN_TOKEN_INSUFFICIENT(500, "Insufficient token balance");
+  REMAIN_TOKEN_INSUFFICIENT(500, "Insufficient token balance"),
+  NOT_ADMIN(403, "Admin permission required");
   private int status;
   private String message;
 }

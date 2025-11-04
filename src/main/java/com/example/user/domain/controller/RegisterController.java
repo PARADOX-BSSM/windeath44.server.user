@@ -25,4 +25,15 @@ public class RegisterController {
             .body(responseDto);
   }
 
+  @PostMapping("/register/admin")
+  public ResponseEntity<ResponseDto<Void>> registerAdmin(
+          @RequestHeader("user-id") String userId,
+          @Valid @RequestBody UserCreateRequest request
+  ) {
+    userService.registerAdmin(userId, request);
+    ResponseDto<Void> responseDto = HttpUtil.success("register admin");
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(responseDto);
+  }
 }
