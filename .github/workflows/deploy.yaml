@@ -1,55 +1,22 @@
-name: Build and Push Docker, Update Manifests
+name: CI/CD
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
 
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+  
 jobs:
-  build-and-update:
-    runs-on: ubuntu-latest
-
-    env:
-      ECR_REGISTRY: ${{ secrets.ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-      IMAGE_NAME: ${{ secrets.ECR_REPOSITORY }}
-
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        run: |
-          aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_REGISTRY
-
-      - name: Generate tag
-        id: vars
-        run: echo "tag=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
-
-      - name: Build Docker image
-        run: |
-          docker build -t $ECR_REGISTRY/$IMAGE_NAME:${{ steps.vars.outputs.tag }} .
-
-      - name: Push Docker image to ECR
-        run: |
-          docker push $ECR_REGISTRY/$IMAGE_NAME:${{ steps.vars.outputs.tag }}
-
-      - name: Clone manifests repository
-        run: |
-          git clone https://x-access-token:${{ secrets.MANIFESTS_REPO_TOKEN }}@github.com/PARADOX-BSSM/windeath44.manifest.user.git
-          cd windeath44.manifest.user
-          git config user.name "${{ secrets.GIT_USERNAME }}"
-          git config user.email "${{ secrets.GIT_EMAIL }}"
-
-          # Update image tag in values.yaml
-          sed -i "s/\(tag:\s*\).*/\1${{ steps.vars.outputs.tag }}/" values.yaml
- 
-          git add values.yaml
-          git commit -m "chore: update image tag to ${{ steps.vars.outputs.tag }} by github action"
-          git push origin master
+  build-deploy:
+    uses: PARADOX-BSSM/windeath44.manifest.cicd/.github/workflows/ci.yml@master
+    with:
+      deploy_repo: 'PARADOX-BSSM/${{ secrets.VALUES_REPO }}'
+      deploy_path_prefix: 'prod'
+      docker_owner: 'windeath44'
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
