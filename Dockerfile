@@ -11,7 +11,7 @@ COPY . .
 RUN ./gradlew bootJar --no-daemon
 
 # 2단계: Runtime
-FROM openjdk:17-jdk
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 COPY --from=build /app/build/libs/*.jar app.jar
