@@ -1,5 +1,6 @@
 package com.example.user.domain.model;
 
+import com.example.user.domain.exception.InsufficientRemainTokenException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,8 +34,8 @@ public class User {
 
   @PrePersist
   public void defaultSettings() {
-    this.remainToken = 0L;
-    String defaultImage = "https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3396.jpg?semt=ais_hybrid&w=740";
+    this.remainToken = 3000L;
+    String defaultImage = "https://windeath44.s3.ap-northeast-2.amazonaws.com/seori_profile.png";
     this.profile = defaultImage;
   }
 
@@ -57,5 +58,21 @@ public class User {
 
   public void updateName(String name) {
     this.name = name;
+  }
+
+  public void decreaseToken(int tokenCount) {
+    boolean canDecreaseRemainToken = this.remainToken >= tokenCount;
+
+    if (!canDecreaseRemainToken) throw InsufficientRemainTokenException.getInstance();
+
+    this.remainToken -= tokenCount;
+  }
+
+  public void increaseToken(Long tokenCount) {
+    this.remainToken += tokenCount;
+  }
+
+  public boolean isAdmin() {
+    return this.role.equals(UserRole.ADMIN);
   }
 }

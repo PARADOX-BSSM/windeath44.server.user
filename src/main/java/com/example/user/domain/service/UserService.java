@@ -11,6 +11,7 @@ import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
 import com.example.user.global.storage.FileStorage;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,16 +31,18 @@ public class UserService {
   private final UserMapper userMapper;
   private final FileStorage fileStorage;
 
+  public List<UserResponse> findAllByIds(List<String> userIds) {
+    List<UserResponse> userResponseList = userRepository.findByUserIds(userIds)
+            .stream()
+            .map(userMapper::toDto)
+            .toList();
+    return userResponseList;
+  }
+
+
   @Transactional
   public void register(UserCreateRequest request) {
-    String userId = request.userId();
-    String email = request.email();
-
-    grpcClientService.validateEmail(email);
-    checkExistsUser(userId, email);
-    User user = toUser(request);
-    user.changeToEncodedPassword(request.password(), passwordEncoder);
-    userRepository.save(user);
+    registerUser(request, UserRole.USER);
   }
 
   private void checkExistsUser(String userId, String email) {
@@ -83,6 +88,7 @@ public class UserService {
   private User getUserById(String userId) {
     User user = userRepository.findByUserId(userId)
             .orElseThrow(NotFoundUserException::getInstance);
+    
     return user;
   }
 
@@ -91,8 +97,8 @@ public class UserService {
     userRepository.delete(user);
   }
 
-  private User toUser(UserCreateRequest request) {
-    User user = userMapper.toEntity(request, UserRole.USER);
+  private User toUser(UserCreateRequest request, UserRole role) {
+    User user = userMapper.toEntity(request, role);
     return user;
   }
 
@@ -127,4 +133,26 @@ public class UserService {
     }
   }
 
+  @Transactional
+  public void registerAdmin(String userId, UserCreateRequest request) {
+    User user = getUserById(userId);
+    validateAdmin(user);
+    registerUser(request, UserRole.ADMIN);
+  }
+
+  private static void validateAdmin(User user) {
+    boolean isAdmin = user.isAdmin();
+    if (!isAdmin) throw NotAdminException.getInstance();
+  }
+
+  private void registerUser(UserCreateRequest request, UserRole role) {
+    String userId = request.userId();
+    String email = request.email();
+
+    grpcClientService.validateEmail(email);
+    checkExistsUser(userId, email);
+    User user = toUser(request, role);
+    user.changeToEncodedPassword(request.password(), passwordEncoder);
+    userRepository.save(user);
+  }
 }

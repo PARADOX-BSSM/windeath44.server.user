@@ -34,3 +34,17 @@ message UserRegisterRequest {
 message UserRegisterResponse {
 
 }
+
+// user id retrieval
+
+service UserIdRetrievalService {
+  rpc getUserIdByEmail(UserIdRetrievalRequest) returns (UserIdRetrievalResponse);
+}
+
+message UserIdRetrievalRequest {
+  string email = 1;
+}
+
+message UserIdRetrievalResponse {
+  string userId = 1;
+}

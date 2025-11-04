@@ -17,6 +17,7 @@ public interface UserMapper {
 
   User toEntity(UserCreateRequest request, UserRole role);
 
+
   UserResponse toDto(User user);
 
   UserIdResponse toUserIdResponse(User user);

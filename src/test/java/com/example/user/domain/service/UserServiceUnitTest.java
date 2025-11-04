@@ -1,5 +1,6 @@
 package com.example.user.domain.service;
 
+import com.example.user.domain.dto.response.UserIdResponse;
 import com.example.user.domain.model.User;
 import com.example.user.domain.model.UserRole;
 import com.example.user.domain.mapper.UserMapper;
@@ -213,14 +214,14 @@ public class UserServiceUnitTest {
     // Given
     String email = "test@example.com";
     String password = "validPassword";
-    String userId = "testUser";
+    UserIdResponse userId = new UserIdResponse("testUser");
     User user = mock(User.class);
     given(userRepository.findUserByEmail(email)).willReturn(Optional.of(user));
     given(user.equalsPassword(password, passwordEncoder)).willReturn(true);
-    given(user.getUserId()).willReturn(userId);
+    given(user.getUserId()).willReturn(userId.userId());
 
     // When
-    String result = userService.retrieveUserId(email, password);
+    UserIdResponse result = userService.retrieveUserId(email, password);
 
     // Then
     assertEquals(userId, result);
