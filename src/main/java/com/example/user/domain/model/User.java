@@ -34,7 +34,7 @@ public class User {
 
   @PrePersist
   public void defaultSettings() {
-    this.remainToken = 3000L;
+    this.remainToken = 10000L;
     String defaultImage = "https://windeath44.s3.ap-northeast-2.amazonaws.com/seori_profile.png";
     this.profile = defaultImage;
   }
