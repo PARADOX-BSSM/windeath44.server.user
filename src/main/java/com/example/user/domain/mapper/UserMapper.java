@@ -1,6 +1,7 @@
 package com.example.user.domain.mapper;
 
 import com.example.user.domain.dto.request.UserCreateRequest;
+import com.example.user.domain.dto.response.UserDetailResponse;
 import com.example.user.domain.dto.response.UserIdResponse;
 import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.model.User;
@@ -19,6 +20,8 @@ public interface UserMapper {
 
 
   UserResponse toDto(User user);
+
+  UserDetailResponse toDetailDto(User user);
 
   UserIdResponse toUserIdResponse(User user);
 }

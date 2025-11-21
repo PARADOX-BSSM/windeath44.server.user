@@ -1,5 +1,6 @@
 package com.example.user.domain.service;
 
+import com.example.user.domain.dto.response.UserDetailResponse;
 import com.example.user.domain.dto.response.UserIdResponse;
 import com.example.user.domain.model.User;
 import com.example.user.domain.model.UserRole;
@@ -7,28 +8,36 @@ import com.example.user.domain.mapper.UserMapper;
 import com.example.user.domain.repository.UserRepository;
 import com.example.user.domain.exception.AlreadyExistsUserEmailException;
 import com.example.user.domain.exception.AlreadyExistsUserIdException;
+import com.example.user.domain.exception.NotAdminException;
 import com.example.user.domain.exception.NotFoundUserException;
 import com.example.user.domain.exception.ValidationPasswordException;
 import com.example.user.domain.dto.request.UserCreateRequest;
 import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
+import com.example.user.global.storage.FileStorage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 
@@ -42,6 +51,8 @@ public class UserServiceUnitTest {
   private UserMapper userMapper;
   @Mock
   private GrpcClientService grpcClientService;
+  @Mock
+  private FileStorage fileStorage;
 
   @InjectMocks
   private UserService userService;
@@ -125,14 +136,88 @@ public class UserServiceUnitTest {
   }
 
   @Test
+  @DisplayName("ADMIN 권한으로 전체 유저를 조회할 수 있는가?")
+  void when_admin_role_then_listUsers_successfully() {
+    // Given
+    User user = mock(User.class);
+    UserDetailResponse detailResponse = mock(UserDetailResponse.class);
+    Page<User> page = new PageImpl<>(List.of(user), PageRequest.of(0, 20), 1);
+
+    given(userRepository.findAll(any(Specification.class), any(Pageable.class))).willReturn(page);
+    given(userRepository.count()).willReturn(10L);
+    given(userMapper.toDetailDto(user)).willReturn(detailResponse);
+
+    // When
+    var response = userService.listUsers(
+            "ADMIN",
+            0,
+            20,
+            "createdAt",
+            org.springframework.data.domain.Sort.Direction.DESC,
+            null,
+            null,
+            null,
+            null
+    );
+
+    // Then
+    assertEquals(10L, response.totalUserCount());
+    assertEquals(1, response.content().size());
+    then(userRepository).should().count();
+    then(userRepository).should().findAll(any(Specification.class), any(Pageable.class));
+  }
+
+  @Test
+  @DisplayName("ADMIN이 아닐 경우 전체 유저 조회시 예외 발생")
+  void when_not_admin_role_then_listUsers_fail() {
+    assertThrows(NotAdminException.class, () -> userService.listUsers(
+            "USER",
+            0,
+            20,
+            "createdAt",
+            org.springframework.data.domain.Sort.Direction.DESC,
+            null,
+            null,
+            null,
+            null
+    ));
+  }
+
+  @Test
+  @DisplayName("ADMIN 권한으로 다른 유저 프로필을 조회할 수 있는가?")
+  void when_admin_role_then_findUserAsAdmin_successfully() {
+    // Given
+    String targetUserId = "target";
+    User user = mock(User.class);
+    UserDetailResponse detailResponse = mock(UserDetailResponse.class);
+    given(userRepository.findByUserId(targetUserId)).willReturn(Optional.of(user));
+    given(userMapper.toDetailDto(user)).willReturn(detailResponse);
+
+    // When
+    UserDetailResponse response = userService.findUserAsAdmin("ADMIN", targetUserId);
+
+    // Then
+    assertEquals(detailResponse, response);
+    then(userRepository).should().findByUserId(targetUserId);
+    then(userMapper).should().toDetailDto(user);
+  }
+
+  @Test
+  @DisplayName("ADMIN이 아니면 다른 유저 프로필 조회 시 예외 발생")
+  void when_not_admin_role_then_findUserAsAdmin_fail() {
+    assertThrows(NotAdminException.class, () -> userService.findUserAsAdmin("USER", "target"));
+  }
+
+  @Test
   @DisplayName("UserId를 통해 유저의 프로필을 변경할 수 있는가?")
-  void when_valid_userId_then_changeProfileById_user_successfully() {
+  void when_valid_userId_then_changeProfileById_user_successfully() throws IOException {
     // Given
     String userId = "test";
     MultipartFile profile = mock(MultipartFile.class);
     User user = mock(User.class);
     UserResponse userResponse = mock(UserResponse.class);
     given(userRepository.findByUserId(userId)).willReturn(Optional.of(user));
+    given(fileStorage.upload(userId, profile)).willReturn("profile-url");
     given(userMapper.toDto(user)).willReturn(userResponse);
 
     // When
@@ -140,7 +225,7 @@ public class UserServiceUnitTest {
 
     // Then
     assertEquals(userResponse, result);
-    then(user).should().updateProfile(profile.toString());
+    then(user).should().updateProfile("profile-url");
     then(userMapper).should().toDto(user);
   }
 
@@ -218,7 +303,7 @@ public class UserServiceUnitTest {
     User user = mock(User.class);
     given(userRepository.findUserByEmail(email)).willReturn(Optional.of(user));
     given(user.equalsPassword(password, passwordEncoder)).willReturn(true);
-    given(user.getUserId()).willReturn(userId.userId());
+    given(userMapper.toUserIdResponse(user)).willReturn(userId);
 
     // When
     UserIdResponse result = userService.retrieveUserId(email, password);
