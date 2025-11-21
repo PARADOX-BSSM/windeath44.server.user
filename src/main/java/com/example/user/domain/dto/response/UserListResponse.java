@@ -7,6 +7,7 @@ public record UserListResponse(
         int page,
         int size,
         long totalElements,
-        int totalPages
+        int totalPages,
+        long totalUserCount
 ) {
 }
