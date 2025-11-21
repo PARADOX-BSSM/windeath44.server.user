@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:userdb;MODE=MYSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.H2Dialect
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        schema.registry.url: http://localhost:8081
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: test-user
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        schema.registry.url: http://localhost:8081
+        specific.avro.reader: true
+
+grpc:
+  server:
+    address: 0.0.0.0
+    port: 9090
+  client:
+    auth-server:
+      address: 0.0.0.0
+      negotiationType: "plaintext"
+
+storage:
+  access-key: test
+  secret-key: test
+  bucket-name: test-bucket
+  region: ap-northeast-2
+
+server:
+  port: 0
