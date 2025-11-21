@@ -12,6 +12,7 @@ import com.example.user.domain.exception.ValidationPasswordException;
 import com.example.user.domain.dto.request.UserCreateRequest;
 import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
+import com.example.user.global.storage.FileStorage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -42,6 +44,8 @@ public class UserServiceUnitTest {
   private UserMapper userMapper;
   @Mock
   private GrpcClientService grpcClientService;
+  @Mock
+  private FileStorage fileStorage;
 
   @InjectMocks
   private UserService userService;
@@ -126,13 +130,14 @@ public class UserServiceUnitTest {
 
   @Test
   @DisplayName("UserId를 통해 유저의 프로필을 변경할 수 있는가?")
-  void when_valid_userId_then_changeProfileById_user_successfully() {
+  void when_valid_userId_then_changeProfileById_user_successfully() throws IOException {
     // Given
     String userId = "test";
     MultipartFile profile = mock(MultipartFile.class);
     User user = mock(User.class);
     UserResponse userResponse = mock(UserResponse.class);
     given(userRepository.findByUserId(userId)).willReturn(Optional.of(user));
+    given(fileStorage.upload(userId, profile)).willReturn("profile-url");
     given(userMapper.toDto(user)).willReturn(userResponse);
 
     // When
@@ -140,7 +145,7 @@ public class UserServiceUnitTest {
 
     // Then
     assertEquals(userResponse, result);
-    then(user).should().updateProfile(profile.toString());
+    then(user).should().updateProfile("profile-url");
     then(userMapper).should().toDto(user);
   }
 
@@ -218,7 +223,7 @@ public class UserServiceUnitTest {
     User user = mock(User.class);
     given(userRepository.findUserByEmail(email)).willReturn(Optional.of(user));
     given(user.equalsPassword(password, passwordEncoder)).willReturn(true);
-    given(user.getUserId()).willReturn(userId.userId());
+    given(userMapper.toUserIdResponse(user)).willReturn(userId);
 
     // When
     UserIdResponse result = userService.retrieveUserId(email, password);
