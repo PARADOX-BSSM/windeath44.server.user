@@ -1,5 +1,6 @@
 package com.example.user.domain.controller;
 
+import com.example.user.domain.dto.request.UserDeleteRequest;
 import com.example.user.domain.dto.request.UserNameUpdateRequest;
 import com.example.user.domain.dto.response.UserDetailResponse;
 import com.example.user.domain.dto.response.UserListResponse;
@@ -129,8 +130,13 @@ public class UserController {
   }
 
   @DeleteMapping
-  public ResponseEntity<ResponseDto<Void>> deleteUserById(@RequestHeader("user-id") String userId) {
-    userService.deleteById(userId);
+  public ResponseEntity<ResponseDto<Void>> deleteUserById(
+          @RequestHeader("user-id") String requesterId,
+          @RequestHeader("role") String requesterRole,
+          @RequestBody(required = false) UserDeleteRequest request
+  ) {
+    String targetUserId = request != null ? request.userId() : null;
+    userService.deleteById(requesterId, requesterRole, targetUserId);
     ResponseDto<Void> responseDto = HttpUtil.success("delete user");
     return ResponseEntity
             .status(HttpStatus.ACCEPTED)

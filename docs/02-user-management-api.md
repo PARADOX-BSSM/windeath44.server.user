@@ -180,10 +180,16 @@ user-id: {userId}
 ```http
 DELETE /users
 user-id: {userId}
+role: USER|ADMIN
+
+{
+    "userId": "targetUserId"   // ADMIN 전용, 생략 시 본인 삭제
+}
 ```
 
 **요구사항**
 - 본인 삭제 또는 ADMIN이 탈퇴 처리 가능.
+- body에 `userId`가 없는 경우 `user-id` 헤더의 본인을 삭제하며, 타겟 지정 시 ADMIN 권한 필수.
 - 삭제 시 S3 프로필, 토큰 레코드, 세션 캐시 삭제.
 - 불변 로그 테이블에 `userId`, `deletedBy`, `deletedAt` 저장.
 
