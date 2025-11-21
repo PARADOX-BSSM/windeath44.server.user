@@ -41,7 +41,8 @@ HTTP/1.1 200 OK
         "page": 0,
         "size": 20,
         "totalElements": 120,
-        "totalPages": 6
+        "totalPages": 6,
+        "totalUserCount": 532
     }
 }
 ```
@@ -50,6 +51,7 @@ HTTP/1.1 200 OK
 - 권한: ADMIN 전용. USER는 자신의 정보만 `/users/profile`로 접근.
 - 정렬 필드는 `createdAt`, `name`, `remainToken`만 허용.
 - 권한 필터링 시 `role` 헤더 값만 참조하며, 미전달 시 전체 조회.
+- 응답에는 현재 조건에 맞는 페이지 정보 외에 전체 사용자 수(`totalUserCount`)도 포함하여 대시보드 지표로 활용.
 - 1초 내 응답을 위해 인덱스(`role`, `created_at`) 활용 및 N+1 쿼리 금지.
 
 ### 1.2 사용자 상세 조회 (Read)
