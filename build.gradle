@@ -50,6 +50,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.5'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testImplementation 'com.h2database:h2'
 
     // Kafka + Avro
     implementation 'org.springframework.kafka:spring-kafka'
