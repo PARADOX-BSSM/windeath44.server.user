@@ -1,26 +1,36 @@
 package com.example.user.domain.service;
 
+import com.example.user.domain.dto.response.UserDetailResponse;
 import com.example.user.domain.dto.response.UserIdResponse;
 import com.example.user.domain.exception.*;
 import com.example.user.domain.model.User;
 import com.example.user.domain.model.UserRole;
 import com.example.user.domain.mapper.UserMapper;
 import com.example.user.domain.repository.UserRepository;
+import com.example.user.domain.repository.UserSpecifications;
 import com.example.user.domain.dto.request.UserCreateRequest;
 import com.example.user.domain.dto.response.UserResponse;
+import com.example.user.domain.dto.response.UserListResponse;
+import com.example.user.domain.dto.response.UsersByIdsResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
 import com.example.user.global.storage.FileStorage;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +41,60 @@ public class UserService {
   private final UserMapper userMapper;
   private final FileStorage fileStorage;
 
-  public List<UserResponse> findAllByIds(List<String> userIds) {
-    List<UserResponse> userResponseList = userRepository.findByUserIds(userIds)
-            .stream()
-            .map(userMapper::toDto)
+  public UsersByIdsResponse findAllByIds(List<String> userIds) {
+    List<User> users = userRepository.findByUserIds(userIds);
+    List<UserDetailResponse> userResponseList = users.stream()
+            .map(userMapper::toDetailDto)
             .toList();
-    return userResponseList;
+
+    Set<String> foundUserIds = users.stream()
+            .map(User::getUserId)
+            .collect(Collectors.toSet());
+
+    List<String> notFoundUserIds = userIds.stream()
+            .filter(id -> !foundUserIds.contains(id))
+            .toList();
+
+    return new UsersByIdsResponse(userResponseList, notFoundUserIds);
+  }
+
+  public UserListResponse listUsers(
+          String requesterRole,
+          int page,
+          int size,
+          String sortField,
+          Sort.Direction direction,
+          String keyword,
+          LocalDateTime createdFrom,
+          LocalDateTime createdTo,
+          UserRole filterRole
+  ) {
+    validateAdminRole(requesterRole);
+
+    int safePage = Math.max(page, 0);
+    int safeSize = Math.min(Math.max(size, 1), 100);
+    Sort sort = Sort.by(direction, sortField);
+    Pageable pageable = PageRequest.of(safePage, safeSize, sort);
+
+    Specification<User> specification = Specification.where(UserSpecifications.keyword(keyword))
+            .and(UserSpecifications.hasRole(filterRole))
+            .and(UserSpecifications.createdFrom(createdFrom))
+            .and(UserSpecifications.createdTo(createdTo));
+
+    Page<User> userPage = userRepository.findAll(specification, pageable);
+    long totalUserCount = userRepository.count();
+    List<UserDetailResponse> content = userPage.getContent().stream()
+            .map(userMapper::toDetailDto)
+            .toList();
+
+    return new UserListResponse(
+            content,
+            userPage.getNumber(),
+            userPage.getSize(),
+            userPage.getTotalElements(),
+            userPage.getTotalPages(),
+            totalUserCount
+    );
   }
 
 
@@ -61,6 +119,12 @@ public class UserService {
     User user = getUserById(userId);
     UserResponse userResponse = toUserResponse(user);
     return userResponse;
+  }
+
+  public UserDetailResponse findUserAsAdmin(String requesterRole, String targetUserId) {
+    validateAdminRole(requesterRole);
+    User user = getUserById(targetUserId);
+    return toUserDetailResponse(user);
   }
 
   @Transactional
@@ -92,8 +156,14 @@ public class UserService {
     return user;
   }
 
-  public void deleteById(String userId) {
-    User user = getUserById(userId);
+  public void deleteById(String requesterId, String requesterRole, String targetUserId) {
+    String targetId = StringUtils.hasText(targetUserId) ? targetUserId : requesterId;
+
+    if (!requesterId.equals(targetId)) {
+      validateAdminRole(requesterRole);
+    }
+
+    User user = getUserById(targetId);
     userRepository.delete(user);
   }
 
@@ -104,6 +174,27 @@ public class UserService {
 
   private UserResponse toUserResponse(User user) {
     return userMapper.toDto(user);
+  }
+
+  private UserDetailResponse toUserDetailResponse(User user) {
+    return userMapper.toDetailDto(user);
+  }
+
+  private void validateAdminRole(String role) {
+    if (!StringUtils.hasText(role)) {
+      throw NotAdminException.getInstance();
+    }
+
+    UserRole requesterRole;
+    try {
+      requesterRole = UserRole.valueOf(role.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      throw NotAdminException.getInstance();
+    }
+
+    if (!UserRole.ADMIN.equals(requesterRole)) {
+      throw NotAdminException.getInstance();
+    }
   }
 
   @Transactional
