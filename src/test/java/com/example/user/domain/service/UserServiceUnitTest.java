@@ -1,18 +1,14 @@
 package com.example.user.domain.service;
 
+import com.example.user.domain.dto.request.UserCreateRequest;
 import com.example.user.domain.dto.response.UserDetailResponse;
 import com.example.user.domain.dto.response.UserIdResponse;
+import com.example.user.domain.dto.response.UserResponse;
+import com.example.user.domain.exception.*;
+import com.example.user.domain.mapper.UserMapper;
 import com.example.user.domain.model.User;
 import com.example.user.domain.model.UserRole;
-import com.example.user.domain.mapper.UserMapper;
 import com.example.user.domain.repository.UserRepository;
-import com.example.user.domain.exception.AlreadyExistsUserEmailException;
-import com.example.user.domain.exception.AlreadyExistsUserIdException;
-import com.example.user.domain.exception.NotAdminException;
-import com.example.user.domain.exception.NotFoundUserException;
-import com.example.user.domain.exception.ValidationPasswordException;
-import com.example.user.domain.dto.request.UserCreateRequest;
-import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
 import com.example.user.global.storage.FileStorage;
 import org.junit.jupiter.api.DisplayName;
@@ -361,5 +357,80 @@ public class UserServiceUnitTest {
     // When & Then
     assertThrows(ValidationPasswordException.class,
             () -> userService.retrieveUserId(email, password));
+  }
+
+  @Test
+  @DisplayName("ADMIN이 다른 사용자를 승격시키면 역할이 ADMIN으로 변경된다")
+  void promoteToAdmin_updates_role() {
+    User target = User.builder()
+            .userId("target")
+            .role(UserRole.USER)
+            .build();
+    given(userRepository.findByUserId("target")).willReturn(Optional.of(target));
+
+    var response = userService.promoteToAdmin("admin", "ADMIN", "target");
+
+    assertTrue(response.changed());
+    assertEquals(UserRole.ADMIN, target.getRole());
+    assertEquals(UserRole.USER, response.previousRole());
+  }
+
+  @Test
+  @DisplayName("이미 ADMIN이면 승격 요청 시 멱등 처리된다")
+  void promoteToAdmin_whenAlreadyAdmin_returns_not_changed() {
+    User target = User.builder()
+            .userId("target")
+            .role(UserRole.ADMIN)
+            .build();
+    given(userRepository.findByUserId("target")).willReturn(Optional.of(target));
+
+    var response = userService.promoteToAdmin("admin", "ADMIN", "target");
+
+    assertFalse(response.changed());
+    assertEquals(UserRole.ADMIN, response.previousRole());
+  }
+
+  @Test
+  @DisplayName("ADMIN이 아닌 사용자를 강등하려면 예외")
+  void demoteToUser_whenNotAdmin_throws() {
+    User target = User.builder()
+            .userId("target")
+            .role(UserRole.USER)
+            .build();
+    given(userRepository.findByUserId("target")).willReturn(Optional.of(target));
+
+    assertThrows(AlreadyUserRoleException.class,
+            () -> userService.demoteToUser("admin", "ADMIN", "target"));
+  }
+
+  @Test
+  @DisplayName("마지막 ADMIN은 강등할 수 없다")
+  void demoteToUser_whenLastAdmin_throws() {
+    User target = User.builder()
+            .userId("target")
+            .role(UserRole.ADMIN)
+            .build();
+    given(userRepository.findByUserId("target")).willReturn(Optional.of(target));
+    given(userRepository.countByRole(UserRole.ADMIN)).willReturn(1L);
+
+    assertThrows(LastAdminNotDemotableException.class,
+            () -> userService.demoteToUser("admin", "ADMIN", "target"));
+  }
+
+  @Test
+  @DisplayName("조건을 만족하면 ADMIN을 USER로 강등할 수 있다")
+  void demoteToUser_success() {
+    User target = User.builder()
+            .userId("target")
+            .role(UserRole.ADMIN)
+            .build();
+    given(userRepository.findByUserId("target")).willReturn(Optional.of(target));
+    given(userRepository.countByRole(UserRole.ADMIN)).willReturn(3L);
+
+    var response = userService.demoteToUser("admin", "ADMIN", "target");
+
+    assertEquals(UserRole.USER, target.getRole());
+    assertEquals(UserRole.USER, response.newRole());
+    assertEquals(UserRole.ADMIN, response.previousRole());
   }
 }

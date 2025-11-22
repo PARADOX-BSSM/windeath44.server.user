@@ -12,7 +12,10 @@ public enum ErrorCode {
   PASSWORD_VALIDATION_FAILED(400, "Password validation failed"),
   FILE_UPLOAD_FAILED(500, "File upload failed"),
   REMAIN_TOKEN_INSUFFICIENT(500, "Insufficient token balance"),
-  NOT_ADMIN(403, "Admin permission required");
+  NOT_ADMIN(403, "Admin permission required"),
+  ROLE_ALREADY_USER(409, "User already has USER role"),
+  LAST_ADMIN_NOT_DEMOTABLE(409, "Last admin cannot be demoted"),
+  SYSTEM_ACCOUNT_NOT_DEMOTABLE(400, "System account cannot be demoted");
   private int status;
   private String message;
 }
