@@ -258,10 +258,33 @@ public class UserServiceUnitTest {
     given(userRepository.findByUserId(userId)).willReturn(Optional.of(user));
 
     // When
-    userService.deleteById(userId);
+    userService.deleteById(userId, "USER", null);
 
     // Then
     then(userRepository).should().delete(user);
+  }
+
+  @Test
+  @DisplayName("ADMIN은 다른 유저를 삭제할 수 있는가?")
+  void when_admin_role_then_deleteOtherUser_successfully() {
+    // Given
+    String requesterId = "admin";
+    String targetUserId = "target";
+    User user = mock(User.class);
+    given(userRepository.findByUserId(targetUserId)).willReturn(Optional.of(user));
+
+    // When
+    userService.deleteById(requesterId, "ADMIN", targetUserId);
+
+    // Then
+    then(userRepository).should().delete(user);
+  }
+
+  @Test
+  @DisplayName("ADMIN이 아니면 다른 유저 삭제 시 예외 발생")
+  void when_not_admin_role_then_deleteOtherUser_fail() {
+    assertThrows(NotAdminException.class,
+            () -> userService.deleteById("user", "USER", "target"));
   }
 
   @Test

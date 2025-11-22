@@ -156,8 +156,14 @@ public class UserService {
     return user;
   }
 
-  public void deleteById(String userId) {
-    User user = getUserById(userId);
+  public void deleteById(String requesterId, String requesterRole, String targetUserId) {
+    String targetId = StringUtils.hasText(targetUserId) ? targetUserId : requesterId;
+
+    if (!requesterId.equals(targetId)) {
+      validateAdminRole(requesterRole);
+    }
+
+    User user = getUserById(targetId);
     userRepository.delete(user);
   }
 
