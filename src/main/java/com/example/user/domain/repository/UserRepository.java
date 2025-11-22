@@ -1,6 +1,7 @@
 package com.example.user.domain.repository;
 
 import com.example.user.domain.model.User;
+import com.example.user.domain.model.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +23,6 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
 
   @Query("select u from User u where u.userId in (:userIds)")
   List<User> findByUserIds(List<String> userIds);
+
+  long countByRole(UserRole role);
 }

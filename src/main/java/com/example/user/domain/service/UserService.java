@@ -1,17 +1,18 @@
 package com.example.user.domain.service;
 
+import com.example.user.domain.dto.request.UserCreateRequest;
 import com.example.user.domain.dto.response.UserDetailResponse;
 import com.example.user.domain.dto.response.UserIdResponse;
+import com.example.user.domain.dto.response.UserListResponse;
+import com.example.user.domain.dto.response.UserResponse;
+import com.example.user.domain.dto.response.UserRoleChangeResponse;
+import com.example.user.domain.dto.response.UsersByIdsResponse;
 import com.example.user.domain.exception.*;
+import com.example.user.domain.mapper.UserMapper;
 import com.example.user.domain.model.User;
 import com.example.user.domain.model.UserRole;
-import com.example.user.domain.mapper.UserMapper;
 import com.example.user.domain.repository.UserRepository;
 import com.example.user.domain.repository.UserSpecifications;
-import com.example.user.domain.dto.request.UserCreateRequest;
-import com.example.user.domain.dto.response.UserResponse;
-import com.example.user.domain.dto.response.UserListResponse;
-import com.example.user.domain.dto.response.UsersByIdsResponse;
 import com.example.user.domain.service.gRPC.GrpcClientService;
 import com.example.user.global.storage.FileStorage;
 import jakarta.transaction.Transactional;
@@ -40,6 +41,7 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
   private final FileStorage fileStorage;
+  private static final String SYSTEM_ACCOUNT_PREFIX = "service-account-";
 
   public UsersByIdsResponse findAllByIds(List<String> userIds) {
     List<User> users = userRepository.findByUserIds(userIds);
@@ -165,6 +167,68 @@ public class UserService {
 
     User user = getUserById(targetId);
     userRepository.delete(user);
+  }
+
+  @Transactional
+  public UserRoleChangeResponse promoteToAdmin(
+          String requesterId,
+          String requesterRole,
+          String userId
+  ) {
+    validateAdminRole(requesterRole);
+    User user = getUserById(userId);
+    UserRole previousRole = user.getRole();
+    boolean changed = !UserRole.ADMIN.equals(previousRole);
+    if (changed) {
+      user.updateRole(UserRole.ADMIN);
+    }
+    return buildRoleChangeResponse(user, previousRole, requesterId, changed);
+  }
+
+  @Transactional
+  public UserRoleChangeResponse demoteToUser(
+          String requesterId,
+          String requesterRole,
+          String userId
+  ) {
+    validateAdminRole(requesterRole);
+    validateSystemAccount(userId);
+
+    User targetUser = getUserById(userId);
+    if (!targetUser.isAdmin()) {
+      throw AlreadyUserRoleException.getInstance();
+    }
+
+    long adminCount = userRepository.countByRole(UserRole.ADMIN);
+    if (adminCount <= 1) {
+      throw LastAdminNotDemotableException.getInstance();
+    }
+
+    UserRole previousRole = targetUser.getRole();
+    targetUser.updateRole(UserRole.USER);
+    return buildRoleChangeResponse(targetUser, previousRole, requesterId, true);
+  }
+
+  private static void validateSystemAccount(String targetUserId) {
+    if (targetUserId != null && targetUserId.startsWith(SYSTEM_ACCOUNT_PREFIX)) {
+      throw SystemAccountNotDemotableException.getInstance();
+    }
+  }
+
+  private UserRoleChangeResponse buildRoleChangeResponse(
+          User user,
+          UserRole previousRole,
+          String requesterId,
+          boolean changed
+  ) {
+    return new UserRoleChangeResponse(
+            user.getUserId(),
+            previousRole,
+            user.getRole(),
+            requesterId,
+            LocalDateTime.now(),
+            changed
+    );
   }
 
   private User toUser(UserCreateRequest request, UserRole role) {

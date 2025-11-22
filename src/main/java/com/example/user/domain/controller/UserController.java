@@ -5,6 +5,7 @@ import com.example.user.domain.dto.request.UserNameUpdateRequest;
 import com.example.user.domain.dto.response.UserDetailResponse;
 import com.example.user.domain.dto.response.UserListResponse;
 import com.example.user.domain.dto.response.UserResponse;
+import com.example.user.domain.dto.response.UserRoleChangeResponse;
 import com.example.user.domain.dto.response.UsersByIdsResponse;
 import com.example.user.domain.model.UserRole;
 import com.example.user.domain.service.UserService;
@@ -141,5 +142,28 @@ public class UserController {
     return ResponseEntity
             .status(HttpStatus.ACCEPTED)
             .body(responseDto);
+  }
+
+  @PatchMapping("/role/admin/{userId}")
+  public ResponseEntity<ResponseDto<UserRoleChangeResponse>> promoteToAdmin(
+          @RequestHeader("user-id") String requesterId,
+          @RequestHeader("role") String requesterRole,
+          @PathVariable("userId") String userId
+  ) {
+    UserRoleChangeResponse response = userService.promoteToAdmin(requesterId, requesterRole, userId);
+    String message = response.changed() ? "promote admin" : "already admin";
+    ResponseDto<UserRoleChangeResponse> responseDto = HttpUtil.success(message, response);
+    return ResponseEntity.ok(responseDto);
+  }
+
+  @PatchMapping("/role/user/{userId}")
+  public ResponseEntity<ResponseDto<UserRoleChangeResponse>> demoteToUser(
+          @RequestHeader("user-id") String requesterId,
+          @RequestHeader("role") String requesterRole,
+          @PathVariable("userId") String userId
+  ) {
+    UserRoleChangeResponse response = userService.demoteToUser(requesterId, requesterRole, userId);
+    ResponseDto<UserRoleChangeResponse> responseDto = HttpUtil.success("demote admin", response);
+    return ResponseEntity.ok(responseDto);
   }
 }
