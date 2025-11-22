@@ -75,4 +75,8 @@ public class User {
   public boolean isAdmin() {
     return this.role.equals(UserRole.ADMIN);
   }
+
+  public void updateRole(UserRole role) {
+    this.role = role;
+  }
 }
