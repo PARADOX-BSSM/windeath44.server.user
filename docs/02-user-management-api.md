@@ -193,6 +193,46 @@ role: USER|ADMIN
 - 삭제 시 S3 프로필, 토큰 레코드, 세션 캐시 삭제.
 - 불변 로그 테이블에 `userId`, `deletedBy`, `deletedAt` 저장.
 
+### 1.9 사용자 권한 ADMIN 승격 (Promote)
+운영자 또는 시스템 계정이 일반 사용자를 관리자 권한으로 승격할 때 사용한다.
+
+```http
+PATCH /users/role/admin/{userId}
+user-id: {requestAdminId}
+role: ADMIN
+```
+
+**요구사항**
+- 권한: 요청자의 `role` 헤더가 ADMIN 이어야 하며, 2FA 여부는 게이트웨이가 검증한다.
+- Request Body 없음.
+- 중복 처리: 이미 ADMIN이면 200 OK + `message="already admin"`로 멱등성 보장.
+- 응답: 200 OK, `data`에 `userId`, `previousRole`, `newRole`, `updatedBy`, `updatedAt` 포함.
+- 검증: 삭제된 사용자 404, 비활성 계정 409. 동시 승격 방지를 위해 버전 필드로 optimistic locking.
+
+### 1.10 사용자 권한 USER 강등 (Demote)
+관리자 권한을 회수하고 일반 사용자로 전환할 때 사용한다.
+
+```http
+PATCH /users/role/user/{userId}
+user-id: {requestAdminId}
+role: ADMIN
+```
+
+**요구사항**
+- 권한: 요청자는 ADMIN. 자기 자신을 강등할 경우 전체 ADMIN 수가 1명 이상인지 선검증.
+- 응답: 200 OK, `message="demote admin"`, `data.role="USER"`.
+- 검증: 이미 USER면 409(`ALREADY_USER`), 시스템 통합 계정(`service-account-*`)은 400(`NOT_DEMOTABLE_ACCOUNT`).
+- 안전 장치: 전체 ADMIN 수가 1명뿐이면 409(`LAST_ADMIN_NOT_DEMOTABLE`).
+
+**모니터링/알림**
+
+| 항목 | 요구사항 |
+|------|-----------|
+| **권한** | 요청자는 ADMIN이며, 자기 자신을 강등하려면 최소 2명 이상의 ADMIN이 남는지 사전 검증.
+| **응답** | 200 OK. `status="success"`, `message="demote admin"`, `data.role="USER"`.
+| **검증** | 시스템 전체 ADMIN 수가 1명뿐이면 409(`LAST_ADMIN_NOT_DEMOTABLE`).
+| **에러 코드** | 404(사용자 없음), 403(권한 부족), 409(이미 USER, 마지막 ADMIN), 423(잠긴 계정).
+
 ## 2. 사용자 복구 API
 
 ### 2.1 비밀번호 재설정
