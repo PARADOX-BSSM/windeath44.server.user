@@ -6,7 +6,6 @@ import com.example.user.domain.dto.response.UserDetailResponse;
 import com.example.user.domain.dto.response.UserListResponse;
 import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.dto.response.UserRoleChangeResponse;
-import com.example.user.domain.dto.response.UsersByIdsResponse;
 import com.example.user.domain.model.UserRole;
 import com.example.user.domain.service.UserService;
 import com.example.user.global.dto.ResponseDto;
@@ -35,13 +34,13 @@ public class UserController {
   private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("createdAt", "name", "remainToken");
 
   @GetMapping(params = "userIds")
-  public ResponseEntity<ResponseDto<UsersByIdsResponse>> getUsersByIds(@RequestParam("userIds") List<String> userIds) {
-    UsersByIdsResponse userResponsesList = userService.findAllByIds(userIds);
-    ResponseDto<UsersByIdsResponse> responseDto = HttpUtil.success("get users by ids", userResponsesList);
+  public ResponseEntity<ResponseDto<List<UserResponse>>> getUsersByIds(@RequestParam("userIds") List<String> userIds) {
+    List<UserResponse> userResponses = userService.findAllByIds(userIds);
+    ResponseDto<List<UserResponse>> responseDto = HttpUtil.success("get users by ids", userResponses);
     return ResponseEntity.ok(responseDto);
   }
 
-  @GetMapping
+  @GetMapping("/admin")
   public ResponseEntity<ResponseDto<UserListResponse>> listUsers(
           @RequestHeader("role") String requesterRole,
           @RequestParam(defaultValue = "0") int page,

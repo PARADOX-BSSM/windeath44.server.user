@@ -6,7 +6,6 @@ import com.example.user.domain.dto.response.UserIdResponse;
 import com.example.user.domain.dto.response.UserListResponse;
 import com.example.user.domain.dto.response.UserResponse;
 import com.example.user.domain.dto.response.UserRoleChangeResponse;
-import com.example.user.domain.dto.response.UsersByIdsResponse;
 import com.example.user.domain.exception.*;
 import com.example.user.domain.mapper.UserMapper;
 import com.example.user.domain.model.User;
@@ -30,8 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,21 +40,11 @@ public class UserService {
   private final FileStorage fileStorage;
   private static final String SYSTEM_ACCOUNT_PREFIX = "service-account-";
 
-  public UsersByIdsResponse findAllByIds(List<String> userIds) {
-    List<User> users = userRepository.findByUserIds(userIds);
-    List<UserDetailResponse> userResponseList = users.stream()
-            .map(userMapper::toDetailDto)
+  public List<UserResponse> findAllByIds(List<String> userIds) {
+    return userRepository.findByUserIds(userIds)
+            .stream()
+            .map(userMapper::toDto)
             .toList();
-
-    Set<String> foundUserIds = users.stream()
-            .map(User::getUserId)
-            .collect(Collectors.toSet());
-
-    List<String> notFoundUserIds = userIds.stream()
-            .filter(id -> !foundUserIds.contains(id))
-            .toList();
-
-    return new UsersByIdsResponse(userResponseList, notFoundUserIds);
   }
 
   public UserListResponse listUsers(
