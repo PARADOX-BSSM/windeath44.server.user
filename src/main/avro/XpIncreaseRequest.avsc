@@ -1,0 +1,24 @@
+{
+  "type": "record",
+  "name": "XpIncreaseRequest",
+  "namespace": "windeath44.server.user.avro",
+  "doc": "XP 증가 요청 스키마",
+  "fields": [
+    {
+      "name": "user_id",
+      "type": "string",
+      "doc": "사용자 ID"
+    },
+    {
+      "name": "increase_amount",
+      "type": "long",
+      "doc": "증가시킬 XP 값"
+    },
+    {
+      "name": "source",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "XP 증가 사유 또는 출처"
+    }
+  ]
+}

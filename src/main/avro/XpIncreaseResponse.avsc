@@ -1,0 +1,30 @@
+{
+  "type": "record",
+  "name": "XpIncreaseResponse",
+  "namespace": "windeath44.server.user.avro",
+  "doc": "XP 증가 응답 스키마",
+  "fields": [
+    {
+      "name": "user_id",
+      "type": "string",
+      "doc": "사용자 ID"
+    },
+    {
+      "name": "success",
+      "type": "boolean",
+      "doc": "XP 증가 성공 여부"
+    },
+    {
+      "name": "added_xp",
+      "type": ["null", "long"],
+      "default": null,
+      "doc": "증가된 XP 양"
+    },
+    {
+      "name": "total_xp",
+      "type": ["null", "long"],
+      "default": null,
+      "doc": "XP 증가 후 총 XP"
+    }
+  ]
+}
