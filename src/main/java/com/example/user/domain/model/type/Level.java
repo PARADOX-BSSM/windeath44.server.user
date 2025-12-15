@@ -6,5 +6,21 @@ public enum Level {
     PATIENT,
     CORPSE,
     GHOST,
-    DEMON
+    DEMON;
+
+    public static Level fromXp(long xp) {
+        if (xp >= 200_000) {
+            return DEMON;
+        }
+        if (xp >= 90_000) {
+            return GHOST;
+        }
+        if (xp >= 35_000) {
+            return CORPSE;
+        }
+        if (xp >= 10_000) {
+            return PATIENT;
+        }
+        return MOURNER;
+    }
 }

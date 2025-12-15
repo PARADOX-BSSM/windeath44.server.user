@@ -85,4 +85,26 @@ public class User {
   public void updateRole(UserRole role) {
     this.role = role;
   }
+
+  public void updateXp(long newXp) {
+    long safeXp = Math.max(newXp, 0);
+    this.xp = safeXp;
+    this.level = Level.fromXp(safeXp);
+  }
+
+  public void applyXpIncrease(Long addedXp, Long totalXp) {
+    long currentXp = this.xp == null ? 0L : this.xp;
+    long nextXp = resolveNextXp(currentXp, addedXp, totalXp);
+    updateXp(nextXp);
+  }
+
+  private static long resolveNextXp(long currentXp, Long addedXp, Long totalXp) {
+    if (totalXp != null) {
+      return totalXp;
+    }
+    if (addedXp != null) {
+      return currentXp + addedXp;
+    }
+    return currentXp;
+  }
 }
