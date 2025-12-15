@@ -8,12 +8,15 @@ import com.example.user.global.infrastructure.KafkaProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import windeath44.server.memorial.avro.MemorialBowedAvroSchema;
 import windeath44.server.user.avro.RemainTokenDecreaseResponse;
 import windeath44.server.user.avro.RemainTokenIncreaseResponse;
 import windeath44.server.user.avro.XpIncreaseResponse;
+
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -97,7 +100,15 @@ public class KafkaEventListener {
 
     @KafkaListener(topics = "xp-increase-response", groupId = "user")
     @Transactional
-    public void handleXpIncreaseResponse(XpIncreaseResponse response) {
+    public void handleXpIncreaseResponse(
+            XpIncreaseResponse response,
+            @Header(value = "processedByUserService", required = false) Boolean processed
+    ) {
+        if (Boolean.TRUE.equals(processed)) {
+            log.debug("XP 증가 응답 이미 처리됨 - userId: {}", response.getUserId());
+            return;
+        }
+
         log.info("XP 증가 응답 수신 - userId: {}, success: {}, addedXp: {}, totalXp: {}",
                 response.getUserId(),
                 response.getSuccess(),
@@ -116,6 +127,13 @@ public class KafkaEventListener {
                     response.getTotalXp()
             );
             log.info("XP 업데이트 완료 - userId: {}", response.getUserId());
+
+            kafkaProducer.send(
+                    "xp-increase-response",
+                    response,
+                    Map.of("processedByUserService", true)
+            );
+            log.info("XP 증가 응답 발행 완료 - userId: {}", response.getUserId());
         } catch (Exception e) {
             log.error("XP 업데이트 처리 실패 - userId: {}, error: {}", response.getUserId(), e.getMessage(), e);
         }
