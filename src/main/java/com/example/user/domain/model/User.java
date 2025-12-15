@@ -1,6 +1,7 @@
 package com.example.user.domain.model;
 
 import com.example.user.domain.exception.InsufficientRemainTokenException;
+import com.example.user.domain.model.type.Level;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,8 @@ public class User {
   private Long remainToken;
   private String profile;
   private Long xp;
+  @Enumerated(EnumType.STRING)
+  private Level level;
   @CreatedDate
   private LocalDateTime createdAt;
 
@@ -39,6 +42,7 @@ public class User {
     String defaultImage = "https://windeath44.s3.ap-northeast-2.amazonaws.com/seori_profile.png";
     this.profile = defaultImage;
     this.xp = 0L;
+    this.level = Level.MOURNER;
   }
 
   public boolean equalsPassword(String password, PasswordEncoder encoder) {
