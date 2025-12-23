@@ -98,6 +98,10 @@ public class User {
     updateXp(nextXp);
   }
 
+  public long getNextLevelRequireXp() {
+      return Level.calculateXpToNextLevel(this.xp);
+  }
+
   private static long resolveNextXp(long currentXp, Long addedXp, Long totalXp) {
     if (totalXp != null) {
       return totalXp;
