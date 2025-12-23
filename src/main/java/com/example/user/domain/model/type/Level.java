@@ -32,19 +32,6 @@ public enum Level {
         return MOURNER;
     }
 
-
-    public static long calculateXpToNextLevel(long currentXp) {
-        long safeXp = Math.max(currentXp, 0);
-        Level currentLevel = fromXp(safeXp);
-        Level nextLevel = currentLevel.getNextLevel();
-        
-        if (currentLevel == nextLevel) {
-            return 0; // 이미 최고 레벨
-        }
-        
-        return nextLevel.minXp - safeXp;
-    }
-
     public Level getNextLevel() {
         return switch (this) {
             case MOURNER -> PATIENT;
@@ -53,5 +40,16 @@ public enum Level {
             case GHOST -> DEMON;
             case DEMON -> DEMON;
         };
+    }
+
+
+    public long getNextLevelRequireXp(long currentXp) {
+        Level nextLevel = getNextLevel();
+        
+        if (this == nextLevel) {
+            return 0;
+        }
+        
+        return nextLevel.minXp - Math.max(currentXp, 0);
     }
 }

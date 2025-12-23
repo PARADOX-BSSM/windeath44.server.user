@@ -99,7 +99,10 @@ public class User {
   }
 
   public long getNextLevelRequireXp() {
-      return Level.calculateXpToNextLevel(this.xp);
+      if (this.level == null || this.xp == null) {
+          return Level.MOURNER.getNextLevelRequireXp(0L);
+      }
+      return this.level.getNextLevelRequireXp(this.xp);
   }
 
   private static long resolveNextXp(long currentXp, Long addedXp, Long totalXp) {

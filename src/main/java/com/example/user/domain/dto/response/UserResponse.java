@@ -9,6 +9,7 @@ public record UserResponse (
         String profile,
         String role,
         Long xp,
-        Level level
+        Level level,
+        Long nextLevelRequireXp
 ) {
 }
