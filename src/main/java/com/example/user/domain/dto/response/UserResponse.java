@@ -1,6 +1,6 @@
 package com.example.user.domain.dto.response;
 
-import com.example.user.domain.model.type.Level;
+import com.example.user.domain.model.type.LevelTitle;
 
 public record UserResponse (
         String userId,
@@ -9,7 +9,8 @@ public record UserResponse (
         String profile,
         String role,
         Long xp,
-        Level level,
+        int level,
+        LevelTitle levelTitle,
         Long nextLevelRequireXp
 ) {
 }

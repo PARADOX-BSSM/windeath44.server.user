@@ -68,12 +68,13 @@ HTTP/1.1 200 OK
     "message": "find user",
     "data": {
         "userId": "string",
-        "email": "string",
         "name": "string",
-        "role": "USER|ADMIN",
         "remainToken": 10000,
         "profile": "https://...",
-        "createdAt": "2024-01-01T00:00:00"
+        "role": "USER|ADMIN",
+        "xp": 0,
+        "level": 1,
+        "levelTitle": "MOURNER|PATIENT|CORPSE|GHOST|DEMON"
     }
 }
 ```
