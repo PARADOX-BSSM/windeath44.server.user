@@ -18,7 +18,7 @@ public interface UserMapper {
 
   User toEntity(UserCreateRequest request, UserRole role);
 
-
+  @Mapping(target = "nextLevelRequireXp", source = "nextLevelRequireXp")
   UserResponse toDto(User user);
 
   UserDetailResponse toDetailDto(User user);

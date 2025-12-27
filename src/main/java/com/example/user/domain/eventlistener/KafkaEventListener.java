@@ -3,15 +3,20 @@ package com.example.user.domain.eventlistener;
 import windeath44.server.chatbot.avro.ChatAvroSchema;
 import com.example.user.domain.service.TokenDecreaseService;
 import com.example.user.domain.service.TokenIncreaseService;
+import com.example.user.domain.service.XpIncreaseService;
 import com.example.user.global.infrastructure.KafkaProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import windeath44.server.memorial.avro.MemorialBowedAvroSchema;
 import windeath44.server.user.avro.RemainTokenDecreaseResponse;
 import windeath44.server.user.avro.RemainTokenIncreaseResponse;
+import windeath44.server.user.avro.XpIncreaseResponse;
+
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -19,6 +24,7 @@ import windeath44.server.user.avro.RemainTokenIncreaseResponse;
 public class KafkaEventListener {
     private final TokenDecreaseService tokenDecreaseService;
     private final TokenIncreaseService tokenIncreaseService;
+    private final XpIncreaseService xpIncreaseService;
     private final KafkaProducer kafkaProducer;
 
     @KafkaListener(topics = "remain-token-decrease-request", groupId = "user")
@@ -91,5 +97,45 @@ public class KafkaEventListener {
                 .setErrorMessage(errorMessage)
                 .build();
     }
-}
 
+    @KafkaListener(topics = "xp-increase-response", groupId = "user")
+    @Transactional
+    public void handleXpIncreaseResponse(
+            XpIncreaseResponse response,
+            @Header(value = "processedByUserService", required = false) Boolean processed
+    ) {
+        if (Boolean.TRUE.equals(processed)) {
+            log.debug("XP 증가 응답 이미 처리됨 - userId: {}", response.getUserId());
+            return;
+        }
+
+        log.info("XP 증가 응답 수신 - userId: {}, success: {}, addedXp: {}, totalXp: {}",
+                response.getUserId(),
+                response.getSuccess(),
+                response.getAddedXp(),
+                response.getTotalXp());
+
+        if (!response.getSuccess()) {
+            log.warn("XP 증가 실패 응답 - userId: {}", response.getUserId());
+            return;
+        }
+
+        try {
+            xpIncreaseService.applyXpIncrease(
+                    response.getUserId(),
+                    response.getAddedXp(),
+                    response.getTotalXp()
+            );
+            log.info("XP 업데이트 완료 - userId: {}", response.getUserId());
+
+            kafkaProducer.send(
+                    "xp-increase-response",
+                    response,
+                    Map.of("processedByUserService", true)
+            );
+            log.info("XP 증가 응답 발행 완료 - userId: {}", response.getUserId());
+        } catch (Exception e) {
+            log.error("XP 업데이트 처리 실패 - userId: {}, error: {}", response.getUserId(), e.getMessage(), e);
+        }
+    }
+}
